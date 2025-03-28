@@ -5,4 +5,4 @@ services:
     publishPath: "frontend/build"
     envVars:
       - key: REACT_APP_BACKEND_URL
-        value: "https://your-backend-service.onrender.com"
+        value: "https://fullstack-ecommerce-app-backend-x04s.onrender.com"
