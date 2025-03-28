@@ -131,17 +131,20 @@ function ProductDetailsPage({ history, match }) {
                                     borderColor: "#C6ACE7",
                                     padding: "2px"
                                 }}>
-                                    Price:<span className="text-success ml-2">₹ {product.price}</span>
+                                    Price:<span className="text-success ml-2">Tsh {product.price}</span>
                                 </span>
                             </Col>
                             <Col sm>
                                 <b>Buy</b>
                                 <hr />
                                 {product.stock ?
-                                    <Link to={`${product.id}/checkout/`}>
-                                        <button className="btn btn-primary">
-                                            <span>Pay with Stripe</span>
-                                        </button>
+                                    // <Link to={`${product.id}/checkout/`}>
+                                    //     <button className="btn btn-primary">
+                                    //         <span>Pay with Stripe</span>
+                                    //     </button>
+                                    // </Link>
+                                    <Link to={`/order-now?product=${product.id}`} className="btn btn-success ml-2">
+                                        Order Now
                                     </Link>
                                     :
                                     <Message variant='danger'>

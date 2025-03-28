@@ -19,7 +19,7 @@ function Product({ product }) {
                     </Link>
 
                     <Card.Text as="h3">
-                        ₹ {product.price}
+                        Tsh {product.price}
                     </Card.Text>
                 </Card.Body>
             </Card>

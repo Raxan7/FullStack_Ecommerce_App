@@ -19,6 +19,15 @@ import ProductCreatePage from './pages/ProductCreatePage'
 import ProductUpdatePage from './pages/ProductUpdatePage'
 import NotFound from './pages/NotFoundPage'
 
+// Import the new components
+import FullScreenAd from './components/FullScreenAd'
+import AdvertisePage from './pages/AdvertisePage'
+import AdSubmissionPage from './pages/AdSubmissionPage'
+import AdApprovalPage from './pages/AdApprovalPage'
+import HelpPage from './pages/HelpPage'
+import AboutPage from './pages/AboutPage'
+import OrderNowPage from './pages/OrderNowPage'
+
 
 const App = () => {
 
@@ -26,6 +35,7 @@ const App = () => {
     <div>
       <Router>
         <NavBar />
+        <FullScreenAd />
         <div className="container mt-4">
           <Switch>
             <Route path="/" component={ProductListPage} exact />
@@ -44,6 +54,14 @@ const App = () => {
             <Route path="/all-addresses/" component={AllAddressesOfUserPage} exact />
             <Route path="/all-addresses/:id/" component={AddressUpdatePage} exact />
             <Route path="/all-orders/" component={OrdersListPage} exact />
+
+            <Route path="/advertise" component={AdvertisePage} exact />
+            <Route path="/ad-submission" component={AdSubmissionPage} exact />
+            <Route path="/ad-approval" component={AdApprovalPage} exact />
+            <Route path="/help" component={HelpPage} exact />
+            <Route path="/about" component={AboutPage} exact />
+            <Route path="/order-now" component={OrderNowPage} exact />
+
             <Route path="" component={NotFound} exact />
           </Switch>
         </div>

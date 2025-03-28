@@ -31,6 +31,16 @@ import {
     getAllOrdersReducer,
 } from "./userReducers";
 
+// Import the new ad reducers
+import {
+    adSubmissionReducer,
+    adApprovalReducer,
+    activeAdsListReducer,
+    pendingAdsListReducer
+} from "./adReducers";
+
+import { orderRequestReducer } from './orderReducers'
+
 const allReducers = combineReducers({
     productsListReducer,
     productDetailsReducer,
@@ -55,7 +65,14 @@ const allReducers = combineReducers({
     userDetailsReducer,
     userDetailsUpdateReducer,
     deleteUserAccountReducer,
+    
+    // Add the new ad reducers
+    adSubmission: adSubmissionReducer, // Changed from adSubmissionReducer
+    adApproval: adApprovalReducer,
+    activeAds: activeAdsListReducer,
+    pendingAds: pendingAdsListReducer,
+
+    orderRequest: orderRequestReducer,
 })
 
-
-export default allReducers
+export default allReducers;

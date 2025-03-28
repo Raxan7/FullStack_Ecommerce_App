@@ -5,7 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap'
 import { logout } from '../actions/userActions'
 import { useHistory } from "react-router-dom";
 import SearchBarForProducts from './SearchBarForProducts'
-
+import logo from '../assets/logo.jpeg'; // Import the logo image
 
 function NavBar() {
 
@@ -28,7 +28,14 @@ function NavBar() {
             <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
                 <Container>
                     <LinkContainer to="/">
-                        <Navbar.Brand><i className="mb-2 fas fa-home"> Home</i></Navbar.Brand>
+                        <Navbar.Brand>
+                            <img
+                                src={logo}
+                                alt="Logo"
+                                style={{ width: '40px', height: '40px', marginRight: '10px' }}
+                            />
+                            Home
+                        </Navbar.Brand>
                     </LinkContainer>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
@@ -39,6 +46,17 @@ function NavBar() {
                                 <Nav.Link >All Products</Nav.Link>
                             </LinkContainer>
 
+                            {/* Add these new links */}
+                            <LinkContainer to="/advertise">
+                            <Nav.Link>Advertise</Nav.Link>
+                            </LinkContainer>
+                            <LinkContainer to="/help">
+                            <Nav.Link>Help</Nav.Link>
+                            </LinkContainer>
+                            <LinkContainer to="/about">
+                            <Nav.Link>About Us</Nav.Link>
+                            </LinkContainer>
+
                             {/* New Product (Admins Only) */}
 
                             {userInfo && userInfo.admin ?
@@ -47,6 +65,13 @@ function NavBar() {
                                 </LinkContainer>
                                 : ""
                             }
+
+                            {/* Admin-only links (if user is admin) */}
+                            {userInfo && userInfo.isAdmin && (
+                                <LinkContainer to="/ad-approval">
+                                    <Nav.Link>Approve Ads</Nav.Link>
+                                </LinkContainer>
+                            )}
 
                                 <span className="">
                                     <SearchBarForProducts />
