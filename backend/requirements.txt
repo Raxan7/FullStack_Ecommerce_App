@@ -5,7 +5,6 @@ certifi==2021.5.30
 chardet==4.0.0
 charset-normalizer==2.0.3
 colorama==0.4.4
-dj-database-url==2.3.0
 Django==5.1.7
 django-cors-headers==3.7.0
 djangorestframework==3.12.4
