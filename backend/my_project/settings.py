@@ -188,5 +188,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CORS_ALLOWED_ORIGINS = [
-    "https://fullstack-ecommerce-app-kcn1.onrender.com",  # Update with actual frontend URL
+    "https://fullstack-ecommerce-app-kcn1.onrender.com/",  # Update with actual frontend URL
 ]
