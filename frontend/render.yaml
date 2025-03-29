@@ -1,8 +1,0 @@
-services:
-  - type: static
-    name: react-frontend
-    buildCommand: "npm install && npm run build"
-    publishPath: "frontend/build"
-    envVars:
-      - key: REACT_APP_BACKEND_URL
-        value: "https://fullstack-ecommerce-app-backend-x04s.onrender.com"
