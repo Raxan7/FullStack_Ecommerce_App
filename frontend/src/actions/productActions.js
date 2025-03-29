@@ -2,31 +2,26 @@ import {
     PRODUCTS_LIST_REQUEST,
     PRODUCTS_LIST_SUCCESS,
     PRODUCTS_LIST_FAIL,
-
     PRODUCT_DETAILS_REQUEST,
     PRODUCT_DETAILS_SUCCESS,
     PRODUCT_DETAILS_FAIL,
-
     CREATE_PRODUCT_REQUEST,
     CREATE_PRODUCT_SUCCESS,
     CREATE_PRODUCT_FAIL,
-
     DELETE_PRODUCT_REQUEST,
     DELETE_PRODUCT_SUCCESS,
     DELETE_PRODUCT_FAIL,
-
     UPDATE_PRODUCT_REQUEST,
     UPDATE_PRODUCT_SUCCESS,
     UPDATE_PRODUCT_FAIL,
-
     CHANGE_DELIVERY_STATUS_REQUEST,
     CHANGE_DELIVERY_STATUS_SUCCESS,
     CHANGE_DELIVERY_STATUS_FAIL,
+} from '../constants/index';
 
-} from '../constants/index'
+import axios from 'axios';
 
-import axios from 'axios'
-
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 // products list
 export const getProductsList = () => async (dispatch) => {
@@ -36,7 +31,7 @@ export const getProductsList = () => async (dispatch) => {
         })
 
         // call api
-        const { data } = await axios.get("/api/products/")
+        const { data } = await axios.get(`${API_URL}/api/products/`)
 
         dispatch({
             type: PRODUCTS_LIST_SUCCESS,
@@ -59,7 +54,7 @@ export const getProductDetails = (id) => async (dispatch) => {
         })
 
         // call api
-        const { data } = await axios.get(`/api/product/${id}/`)
+        const { data } = await axios.get(`${API_URL}/api/product/${id}/`)
 
         dispatch({
             type: PRODUCT_DETAILS_SUCCESS,
@@ -96,7 +91,7 @@ export const createProduct = (product) => async (dispatch, getState) => {
 
         // api call
         const { data } = await axios.post(
-            "/api/product-create/",
+            `${API_URL}/api/product-create/`,
             product,
             config
         )
@@ -134,7 +129,7 @@ export const deleteProduct = (id) => async (dispatch, getState) => {
 
         // api call
         const { data } = await axios.delete(
-            `/api/product-delete/${id}/`,
+            `${API_URL}/api/product-delete/${id}/`,
             config
         )
 
@@ -173,7 +168,7 @@ export const updateProduct = (id, product) => async (dispatch, getState) => {
 
         // api call
         const { data } = await axios.put(
-            `/api/product-update/${id}/`,
+            `${API_URL}/api/product-update/${id}/`,
             product,
             config
         )
@@ -214,7 +209,7 @@ export const changeDeliveryStatus = (id, product) => async (dispatch, getState) 
 
         // api call
         const { data } = await axios.put(
-            `/account/change-order-status/${id}/`,
+            `${API_URL}/account/change-order-status/${id}/`,
             product,
             config
         )
