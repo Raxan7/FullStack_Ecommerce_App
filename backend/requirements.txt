@@ -7,7 +7,7 @@ charset-normalizer==2.0.3
 colorama==0.4.4
 Django
 django-cors-headers==3.7.0
-djangorestframework==3.12.4
+djangorestframework
 djangorestframework-simplejwt==4.7.1
 gunicorn==23.0.0
 idna==2.10
