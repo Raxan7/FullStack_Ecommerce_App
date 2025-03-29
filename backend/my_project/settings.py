@@ -186,10 +186,6 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# cors origin
-CORS_ALLOW_ALL_ORIGINS = True
-
-MIDDLEWARE.insert(1, 'corsheaders.middleware.CorsMiddleware')
 
 CORS_ALLOWED_ORIGINS = [
     "https://fullstack-ecommerce-app-kcn1.onrender.com",  # Update with actual frontend URL
