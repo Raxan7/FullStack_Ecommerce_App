@@ -120,6 +120,9 @@ function ProductDetailsPage({ history, match }) {
 
                             <Col sm>
                                 <b>{product.name}</b>
+                                <span className="badge badge-secondary ml-2">
+                                    {product.category_name}
+                                </span>
                                 <hr />
                                 <span className="justify-description-css">
                                     <p>{product.description}</p>
