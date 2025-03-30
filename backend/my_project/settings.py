@@ -171,14 +171,11 @@ REST_FRAMEWORK = {
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
-MEDIA_URL = '/images/' # to load media files on admin page as well (changes in url.py file also, project level)
+STATIC_URL = os.path.join(BASE_DIR, "static/")
+MEDIA_ROOT = STATIC_URL + 'images/'
 
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),] # new
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-
-# user uploaded media or image gets uploaded at this media root (which is static/images folder)
-MEDIA_ROOT = 'static/images'
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
@@ -189,5 +186,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CORS_ALLOWED_ORIGINS = [
-    "https://fullstack-ecommerce-app-kcn1.onrender.com",  # Update with actual frontend URL
+    "https://fullstack-ecommerce-app-kcn1.onrender.com",
+    "http://localhost:3000",
 ]
