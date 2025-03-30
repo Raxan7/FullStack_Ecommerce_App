@@ -9,8 +9,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True)
+    category_name = serializers.CharField(source='category.name', read_only=True)
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'stock', 'image', 'category']
+        fields = ['id', 'name', 'description', 'price', 'stock', 'image', 'category_name']
