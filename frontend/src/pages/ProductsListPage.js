@@ -2,52 +2,61 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProductsList } from '../actions/productActions';
 import Message from '../components/Message';
-import { 
-  Spinner, 
-  Row, 
-  Col, 
-  Card, 
-  Button, 
-  ButtonGroup 
-} from 'react-bootstrap';
+import { Spinner, Row, Col, Card, Button, ButtonGroup } from 'react-bootstrap';
 import Product from '../components/Product';
 import { useHistory } from 'react-router-dom';
 import { CREATE_PRODUCT_RESET } from '../constants';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 function ProductsListPage() {
     let history = useHistory();
     let searchTerm = history.location.search ? history.location.search.split("=")[1].toLowerCase() : "";
     const dispatch = useDispatch();
     const [selectedCategory, setSelectedCategory] = useState('All');
-
-    // Define categories array
-    const categories = ['All', 'Clothing', 'Electronics', 'Food', 'Shoes'];
+    const [categories, setCategories] = useState(['All']);
+    
+    // Fetch categories from API
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const { data } = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/categories/`);
+                const uniqueCategories = ['All', ...new Set(data.map(category => category.name))];
+                setCategories(uniqueCategories);
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     // products list reducer
     const productsListReducer = useSelector(state => state.productsListReducer);
     const { loading, error, products } = productsListReducer;
 
+    // Fetch products based on selected category
     useEffect(() => {
-        dispatch(getProductsList());
-        dispatch({
-            type: CREATE_PRODUCT_RESET
-        });
-    }, [dispatch]);
+        const fetchProducts = async () => {
+            try {
+                const query = selectedCategory !== 'All' ? `?category=${selectedCategory}` : '';
+                await dispatch(getProductsList(query));
+            } catch (error) {
+                console.error("Error fetching products:", error);
+            }
+        };
+        fetchProducts();
+        dispatch({ type: CREATE_PRODUCT_RESET });
+    }, [dispatch, selectedCategory]);
 
     const showNothingMessage = () => {
-        return (
-            <div>
-                {!loading ? <Message variant='info'>Nothing to show</Message> : ""}                
-            </div>
-        );
+        return !loading && <Message variant='info'>Nothing to show</Message>;
     };
 
     // Filter products by category and search term
     const filteredProducts = products.filter(product => {
         const matchesSearch = product.name.toLowerCase().includes(searchTerm);
         const matchesCategory = selectedCategory === 'All' || 
-                              (product.category && product.category.name === selectedCategory);
+                              product.category_name === selectedCategory;
         return matchesSearch && matchesCategory;
     });
 
@@ -60,23 +69,14 @@ function ProductsListPage() {
                 borderRadius: '10px'
             }}>
                 <Card.Body className="text-center py-4">
-                    <h2 style={{ 
-                        color: '#2c3e50',
-                        fontWeight: 'bold',
-                        marginBottom: '1rem'
-                    }}>
+                    <h2 style={{ color: '#2c3e50', fontWeight: 'bold', marginBottom: '1rem' }}>
                         Want More Customers For Your Products?
                     </h2>
-                    <p className="lead mb-4" style={{ 
-                        color: '#34495e',
-                        fontSize: '1.25rem'
-                    }}>
+                    <p className="lead mb-4" style={{ color: '#34495e', fontSize: '1.25rem' }}>
                         Advertise with us and reach thousands of potential buyers!
                     </p>
                     <div className="d-flex justify-content-center">
-                        <Link 
-                            to="/advertise" 
-                            className="btn btn-primary btn-lg"
+                        <Link to="/advertise" className="btn btn-primary btn-lg"
                             style={{
                                 padding: '0.75rem 2rem',
                                 fontSize: '1.1rem',
@@ -92,8 +92,7 @@ function ProductsListPage() {
                             onMouseOut={(e) => {
                                 e.target.style.transform = 'translateY(0)';
                                 e.target.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
-                            }}
-                        >
+                            }}>
                             Advertise With Us →
                         </Link>
                     </div>
@@ -119,28 +118,28 @@ function ProductsListPage() {
                 </ButtonGroup>
             </div>
 
-            {/* Existing Product Listing */}
+            {/* Product Listing */}
             {error && <Message variant='danger'>{error}</Message>}
-            {loading && <span style={{ display: "flex" }}>
-                <h5>Getting Products</h5>
-                <span className="ml-2">
+            {loading ? (
+                <div className="text-center py-5">
                     <Spinner animation="border" />
-                </span>
-            </span>}
-            <div>
+                    <p className="mt-2">Loading products...</p>
+                </div>
+            ) : (
                 <Row>
-                    {filteredProducts.length === 0 
-                        ? showNothingMessage() 
-                        : filteredProducts.map((product) => (
-                                <Col key={product.id} sm={12} md={6} lg={4} xl={3}>
-                                    <div className="mx-2"> 
-                                        <Product product={product} />
-                                    </div>
-                                </Col>
-                            ))
-                    }
+                    {filteredProducts.length > 0 ? (
+                        filteredProducts.map(product => (
+                            <Col key={product.id} sm={12} md={6} lg={4} xl={3}>
+                                <div className="mx-2">
+                                    <Product product={product} />
+                                </div>
+                            </Col>
+                        ))
+                    ) : (
+                        showNothingMessage()
+                    )}
                 </Row>
-            </div>
+            )}
         </div>
     );
 }
