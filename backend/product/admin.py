@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import Product, Category
+from .models import Product, Category, Supplier
 
 
 admin.site.register(Product)
+admin.site.register(Supplier)
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
