@@ -1,150 +1,172 @@
-import React, { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { Form, Button, Row, Col, Container, Alert, Spinner } from 'react-bootstrap'
-import { useHistory, useLocation } from 'react-router-dom'
-import { createOrderRequest } from '../actions/orderActions'
-import { ORDER_REQUEST_RESET } from '../constants'
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Form, Button, Container, Alert } from 'react-bootstrap';
+import { useLocation, useHistory } from 'react-router-dom'; // Changed useNavigate to useHistory
+import { createOrderRequest } from '../actions/orderActions';
 
 function OrderNowPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    region: '',
-    district: '',
-    ward: '',
-    street: '',
-    product_details: ''
-  })
-
-  const dispatch = useDispatch()
-  const history = useHistory()
-  const location = useLocation()
-
-  const orderRequest = useSelector(state => state.orderRequest)
-  const { loading, error, success } = orderRequest
-
-  const { userInfo } = useSelector(state => state.userLogin || {})
-
-  // Handle form input changes
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value
-    })
-  }
-
-  // Set product details from URL
-  useEffect(() => {
-    if (location.search) {
-      const params = new URLSearchParams(location.search)
-      const productId = params.get('product')
-      if (productId) {
-        setFormData(prev => ({
-          ...prev,
-          product_details: `Order for product ID: ${productId}`
-        }))
-      }
-    }
-  }, [location])
-
-  // Handle redirects
-  useEffect(() => {
-    if (!userInfo) {
-      history.push('/login?redirect=/order-now' + location.search)
-      return
-    }
-
-    if (success) {
-      const timer = setTimeout(() => {
-        dispatch({ type: ORDER_REQUEST_RESET })
-        history.push('/')
-      }, 2000) // Redirect after 2 seconds to show success message
-      return () => clearTimeout(timer)
-    }
-  }, [dispatch, history, userInfo, success, location.search])
-
-  const submitHandler = (e) => {
-    e.preventDefault()
+    const [formData, setFormData] = useState({
+        name: '',
+        region: '',
+        district: '',
+        ward: '',
+        street: '',
+    });
+    const [showSuccess, setShowSuccess] = useState(false);
     
-    if (!userInfo) {
-      history.push('/login?redirect=/order-now' + location.search)
-      return
-    }
+    const location = useLocation();
+    const history = useHistory(); // Changed navigate to history
+    const dispatch = useDispatch();
+    const { userInfo } = useSelector(state => state.userLogin || {});
+    const { product } = useSelector(state => state.productDetailsReducer || {});
 
-    dispatch(createOrderRequest({
-      ...formData,
-      user: userInfo.id
-    }))
-  }
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        // Redirect to login if not authenticated
+        if (!userInfo) {
+            history.push(`/login?redirect=/order-now${location.search}`);
+            return;
+        }
 
-  return (
-    <Container>
-      <Row className="justify-content-md-center">
-        <Col xs={12} md={8} lg={6}>
-          <h2 className="my-4 text-center">Place Your Order</h2>
-          
-          {success && (
-            <Alert variant="success" className="text-center">
-              Order submitted successfully! Redirecting...
-            </Alert>
-          )}
-          
-          {error && <Alert variant="danger">{error}</Alert>}
-          
-          <Form onSubmit={submitHandler}>
-            {['name', 'region', 'district', 'ward', 'street'].map((field) => (
-              <Form.Group key={field} controlId={field}>
-                <Form.Label>
-                  {field.charAt(0).toUpperCase() + field.slice(1).replace('_', ' ')}
-                </Form.Label>
-                <Form.Control
-                  type="text"
-                  value={formData[field]}
-                  onChange={handleChange}
-                  required
-                  placeholder={`Enter your ${field.replace('_', ' ')}`}
-                />
-              </Form.Group>
-            ))}
+        // Get order details from URL
+        const params = new URLSearchParams(location.search);
+        const productName = params.get('name') || 'Product';
+        const quantity = params.get('qty') || 1;
+        const productId = params.get('product');
 
-            <Form.Group controlId="product_details">
-              <Form.Label>Product Details</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value={formData.product_details}
-                onChange={handleChange}
-                required
-                placeholder="Describe what you want to order"
-              />
-            </Form.Group>
+        // Construct WhatsApp message
+        const message = `*NEW ORDER REQUEST*%0A%0A` +
+                       `*Product:* ${productName}%0A` +
+                       `*Quantity:* ${quantity}%0A` +
+                       `*Customer Name:* ${formData.name}%0A` +
+                       `*Delivery Location:*%0A` +
+                       `- Region: ${formData.region}%0A` +
+                       `- District: ${formData.district}%0A` +
+                       `- Ward: ${formData.ward}%0A` +
+                       `- Street: ${formData.street}%0A%0A` +
+                       `Please confirm this order.`;
 
-            <div className="text-center mt-4">
-              <Button 
-                variant="primary" 
-                type="submit"
-                disabled={loading}
-                size="lg"
-              >
-                {loading ? (
-                  <>
-                    <Spinner
-                      as="span"
-                      animation="border"
-                      size="sm"
-                      role="status"
-                      aria-hidden="true"
-                      className="mr-2"
-                    />
-                    Processing...
-                  </>
-                ) : 'Submit Order'}
-              </Button>
+        // Encode the message
+        const encodedMessage = encodeURIComponent(message);
+
+        // Use actual WhatsApp number or fallback
+        const whatsappNumber = product?.supplier_info?.whatsapp_number || '255123456789'; // Replace with actual number
+        const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+        // Open WhatsApp in a new tab immediately
+        window.open(whatsappURL, '_blank');
+
+        // Save to database after opening WhatsApp
+        dispatch(createOrderRequest({
+            ...formData,
+            user: userInfo.id,
+            product: productId,
+            quantity: quantity,
+            whatsapp_message: message
+        }));
+
+        setShowSuccess(true);
+    };
+
+    const handleChange = (e) => {
+        const { id, value } = e.target;
+        setFormData(prev => ({ ...prev, [id]: value }));
+    };
+
+    return (
+        <Container className="py-4">
+            <div className="mx-auto" style={{ maxWidth: '600px' }}>
+                <h2 className="text-center mb-4">Complete Your Order</h2>
+                {showSuccess && (
+                    <Alert variant="success" className="text-center">
+                        Redirecting to WhatsApp...
+                    </Alert>
+                )}
+                
+                <Form onSubmit={handleSubmit} className="border p-4 rounded-3 shadow-sm bg-white">
+                    <Form.Group className="mb-3">
+                        <Form.Label>Full Name</Form.Label>
+                        <Form.Control
+                            id="name"
+                            type="text"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                            placeholder="John Doe"
+                        />
+                    </Form.Group>
+
+                    <h5 className="mt-4 mb-3">Delivery Details</h5>
+                    
+                    <div className="row g-3">
+                        <div className="col-md-6">
+                            <Form.Group className="mb-3">
+                                <Form.Label>Region</Form.Label>
+                                <Form.Control
+                                    id="region"
+                                    type="text"
+                                    value={formData.region}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="Dar es Salaam"
+                                />
+                            </Form.Group>
+                        </div>
+                        <div className="col-md-6">
+                            <Form.Group className="mb-3">
+                                <Form.Label>District</Form.Label>
+                                <Form.Control
+                                    id="district"
+                                    type="text"
+                                    value={formData.district}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="Ilala"
+                                />
+                            </Form.Group>
+                        </div>
+                        <div className="col-md-6">
+                            <Form.Group className="mb-3">
+                                <Form.Label>Ward</Form.Label>
+                                <Form.Control
+                                    id="ward"
+                                    type="text"
+                                    value={formData.ward}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="Kariakoo"
+                                />
+                            </Form.Group>
+                        </div>
+                        <div className="col-md-6">
+                            <Form.Group className="mb-3">
+                                <Form.Label>Street/House</Form.Label>
+                                <Form.Control
+                                    id="street"
+                                    type="text"
+                                    value={formData.street}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="Maktaba St, House No."
+                                />
+                            </Form.Group>
+                        </div>
+                    </div>
+
+                    <Button 
+                        variant="primary" 
+                        type="submit" 
+                        size="lg"
+                        className="w-100 mt-3 py-2"
+                    >
+                        <i className="fab fa-whatsapp me-2"></i>
+                        Send Order via WhatsApp
+                    </Button>
+                </Form>
             </div>
-          </Form>
-        </Col>
-      </Row>
-    </Container>
-  )
+        </Container>
+    );
 }
 
-export default OrderNowPage
+export default OrderNowPage;

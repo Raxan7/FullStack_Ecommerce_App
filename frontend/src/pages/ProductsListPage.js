@@ -1,36 +1,55 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { getProductsList } from '../actions/productActions'
-import Message from '../components/Message'
-import { Spinner, Row, Col, Card } from 'react-bootstrap'
-import Product from '../components/Product'
-import { useHistory } from "react-router-dom";
-import { CREATE_PRODUCT_RESET } from '../constants'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getProductsList } from '../actions/productActions';
+import Message from '../components/Message';
+import { 
+  Spinner, 
+  Row, 
+  Col, 
+  Card, 
+  Button, 
+  ButtonGroup 
+} from 'react-bootstrap';
+import Product from '../components/Product';
+import { useHistory } from 'react-router-dom';
+import { CREATE_PRODUCT_RESET } from '../constants';
+import { Link } from 'react-router-dom';
 
 function ProductsListPage() {
-    let history = useHistory()
+    let history = useHistory();
     let searchTerm = history.location.search ? history.location.search.split("=")[1].toLowerCase() : "";
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
+    const [selectedCategory, setSelectedCategory] = useState('All');
+
+    // Define categories array
+    const categories = ['All', 'Clothing', 'Electronics', 'Food', 'Shoes'];
 
     // products list reducer
-    const productsListReducer = useSelector(state => state.productsListReducer)
-    const { loading, error, products } = productsListReducer
+    const productsListReducer = useSelector(state => state.productsListReducer);
+    const { loading, error, products } = productsListReducer;
 
     useEffect(() => {
-        dispatch(getProductsList())
+        dispatch(getProductsList());
         dispatch({
             type: CREATE_PRODUCT_RESET
-        })
-    }, [dispatch])
+        });
+    }, [dispatch]);
 
     const showNothingMessage = () => {
         return (
             <div>
                 {!loading ? <Message variant='info'>Nothing to show</Message> : ""}                
             </div>
-        )
-    }
+        );
+    };
+
+    // Filter products by category and search term
+    const filteredProducts = products.filter(product => {
+        const matchesSearch = product.name.toLowerCase().includes(searchTerm);
+        const matchesCategory = selectedCategory === 'All' || 
+                              (product.category && product.category.name === selectedCategory);
+        return matchesSearch && matchesCategory;
+    });
 
     return (
         <div>
@@ -67,12 +86,12 @@ function ProductsListPage() {
                                 transition: 'all 0.3s ease'
                             }}
                             onMouseOver={(e) => {
-                                e.target.style.transform = 'translateY(-2px)'
-                                e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)'
+                                e.target.style.transform = 'translateY(-2px)';
+                                e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
                             }}
                             onMouseOut={(e) => {
-                                e.target.style.transform = 'translateY(0)'
-                                e.target.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)'
+                                e.target.style.transform = 'translateY(0)';
+                                e.target.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
                             }}
                         >
                             Advertise With Us →
@@ -84,6 +103,22 @@ function ProductsListPage() {
                 </Card.Body>
             </Card>
 
+            {/* Category Filter Buttons */}
+            <div className="mb-4 text-center">
+                <ButtonGroup className="flex-wrap">
+                    {categories.map(category => (
+                        <Button
+                            key={category}
+                            variant={selectedCategory === category ? 'primary' : 'outline-primary'}
+                            onClick={() => setSelectedCategory(category)}
+                            className="mx-1 mb-2 rounded-pill"
+                        >
+                            {category}
+                        </Button>
+                    ))}
+                </ButtonGroup>
+            </div>
+
             {/* Existing Product Listing */}
             {error && <Message variant='danger'>{error}</Message>}
             {loading && <span style={{ display: "flex" }}>
@@ -94,10 +129,9 @@ function ProductsListPage() {
             </span>}
             <div>
                 <Row>
-                    {products.filter((item) => item.name.toLowerCase().includes(searchTerm)).length === 0 
+                    {filteredProducts.length === 0 
                         ? showNothingMessage() 
-                        : products.filter((item) => item.name.toLowerCase().includes(searchTerm))
-                            .map((product, idx) => (
+                        : filteredProducts.map((product) => (
                                 <Col key={product.id} sm={12} md={6} lg={4} xl={3}>
                                     <div className="mx-2"> 
                                         <Product product={product} />
@@ -108,7 +142,7 @@ function ProductsListPage() {
                 </Row>
             </div>
         </div>
-    )
+    );
 }
 
-export default ProductsListPage
+export default ProductsListPage;
