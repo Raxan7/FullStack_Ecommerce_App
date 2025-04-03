@@ -91,7 +91,7 @@ function ProductDetailsPage({ history, match }) {
                                     height="420"
                                     onError={(e) => {
                                         e.target.onerror = null;
-                                        e.target.src = `${process.env.PUBLIC_URL}/placeholder-image.jpg`;
+                                        e.target.src = ''; // Remove fallback to placeholder image
                                     }}
                                 />
 

@@ -19,7 +19,7 @@ function Product({ product }) {
                             height="162"
                             onError={(e) => {
                                 e.target.onerror = null; // Prevent infinite loop
-                                e.target.src = `${process.env.PUBLIC_URL}/placeholder-image.jpg`;
+                                e.target.src = ''; // Remove placeholder logic
                             }}
                         />
                     </Link>
