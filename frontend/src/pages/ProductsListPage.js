@@ -48,6 +48,15 @@ function ProductsListPage() {
         dispatch({ type: CREATE_PRODUCT_RESET });
     }, [dispatch, selectedCategory]);
 
+    // Log image paths of products
+    useEffect(() => {
+        if (products && products.length > 0) {
+            products.forEach(product => {
+                console.log(`Product Image Path: ${product.image}`);
+            });
+        }
+    }, [products]);
+
     const showNothingMessage = () => {
         return !loading && <Message variant='info'>Nothing to show</Message>;
     };
