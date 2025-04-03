@@ -13,7 +13,7 @@ class ProductSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'image', 'supplier_info']
+        fields = ['id', 'name', 'description', 'price', 'image', 'supplier_info', 'stock', 'category']
     
     def get_supplier_info(self, obj):
         if obj.supplier:
