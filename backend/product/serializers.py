@@ -9,8 +9,16 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(source='category.name', read_only=True)
-
+    supplier_info = serializers.SerializerMethodField()
+    
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'stock', 'image', 'category_name']
+        fields = ['id', 'name', 'description', 'price', 'image', 'supplier_info']
+    
+    def get_supplier_info(self, obj):
+        if obj.supplier:
+            return {
+                'name': obj.supplier.name,
+                'whatsapp_link': obj.supplier.whatsapp_link
+            }
+        return None

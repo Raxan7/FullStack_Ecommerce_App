@@ -16,6 +16,16 @@ class Category(models.Model):
 
 def get_default_category():
     return Category.objects.get_or_create(name='Electronics', slug='electronics')[0].id
+    
+
+class Supplier(models.Model):
+    name = models.CharField(max_length=100)
+    whatsapp_number = models.CharField(max_length=20)
+    # other fields...
+
+    @property
+    def whatsapp_link(self):
+        return f"https://wa.me/{self.whatsapp_number}"
 
 
 class Product(models.Model):
@@ -29,7 +39,7 @@ class Product(models.Model):
         on_delete=models.SET_DEFAULT,
         default=get_default_category
     )
+    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.name
-    
