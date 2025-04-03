@@ -20,6 +20,13 @@ function ProductDetailsPage({ history, match }) {
     const deleteProductReducer = useSelector(state => state.deleteProductReducer);
     const { success: productDeletionSuccess } = deleteProductReducer;
 
+    // Construct image URL using environment variable
+    const getImageUrl = (imagePath) => {
+        if (!imagePath) return '';
+        if (imagePath.startsWith('http')) return imagePath;
+        return `${process.env.REACT_APP_API_BASE_URL}${imagePath}`;
+    };
+
     useEffect(() => {
         dispatch(getProductDetails(match.params.id));
         dispatch({ type: UPDATE_PRODUCT_RESET });
@@ -78,7 +85,15 @@ function ProductDetailsPage({ history, match }) {
                     <Container>
                         <Row>
                             <Col md={6}>
-                                <Card.Img variant="top" src={product.image} height="420" />
+                                <Card.Img 
+                                    variant="top" 
+                                    src={getImageUrl(product.image)} 
+                                    height="420"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = `${process.env.PUBLIC_URL}/placeholder-image.jpg`;
+                                    }}
+                                />
 
                                 {userInfo && userInfo.admin && (
                                     <span style={{ display: "flex" }}>
