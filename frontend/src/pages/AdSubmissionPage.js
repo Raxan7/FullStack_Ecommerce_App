@@ -8,7 +8,7 @@ import { AD_SUBMISSION_RESET } from '../constants'
 function AdSubmissionPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
+  const [phone, setPhone] = useState('') // Define phone state
   const [adTitle, setAdTitle] = useState('')
   const [adDescription, setAdDescription] = useState('')
   const [adType, setAdType] = useState('image')

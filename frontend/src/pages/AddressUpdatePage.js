@@ -5,7 +5,6 @@ import { checkTokenValidation, getAllAddress, getSingleAddress, logout, updateUs
 import { useHistory } from 'react-router-dom'
 import { UPDATE_USER_ADDRESS_RESET } from '../constants'
 
-
 const AddressUpdatePage = ({ match }) => {
 
     let history = useHistory()

@@ -26,10 +26,16 @@ function BottomNavBar() {
                 </Link>
             </div>
             <div className="text-center">
-                <a href={null}>
+                <button
+                    className="nav-link"
+                    onClick={() => {
+                        // Handle click event
+                    }}
+                    style={{ background: 'none', border: 'none', padding: 0, color: 'inherit', cursor: 'pointer' }}
+                >
                     <FaSearch size={24} />
                     <p style={{ fontSize: '0.75rem', margin: 0 }}>Search</p>
-                </a>
+                </button>
             </div>
             <div className="text-center">
                 <Link to="/">

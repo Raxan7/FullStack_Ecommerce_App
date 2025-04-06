@@ -3,6 +3,7 @@ import { Container, Row, Col, Card } from 'react-bootstrap'
 import { FaShoppingBag, FaThumbsUp, FaHeadset } from 'react-icons/fa'
 import teamPhoto from '../assets/logo.jpeg' // Add your team photo
 import './css/AboutPage.css' // Create this CSS file
+import BottomNavBar from '../components/BottomNavBar'; // Import the component
 
 function AboutPage() {
   return (
@@ -105,6 +106,7 @@ function AboutPage() {
           </div>
         </Col>
       </Row>
+      <BottomNavBar /> {/* Add the BottomNavBar */}
     </Container>
   )
 }

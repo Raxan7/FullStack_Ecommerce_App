@@ -8,7 +8,7 @@ import { changeDeliveryStatus } from '../actions/productActions'
 import { CHANGE_DELIVERY_STATUS_RESET } from '../constants'
 import SearchBarForOrdersPage from '../components/SearchBarForOrdersPage'
 import Message from '../components/Message'
-
+import BottomNavBar from '../components/BottomNavBar'
 
 function OrdersListPage() {
 
@@ -175,6 +175,7 @@ function OrdersListPage() {
                     ))}
                 </Table>
                 : <Message variant="info">No orders yet.</Message> }
+            <BottomNavBar />
         </div>
     )
 }

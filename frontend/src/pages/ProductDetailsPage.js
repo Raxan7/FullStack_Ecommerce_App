@@ -5,6 +5,7 @@ import Message from '../components/Message';
 import { Spinner, Row, Col, Container, Card, Button, Modal, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { CREATE_PRODUCT_RESET, DELETE_PRODUCT_RESET, UPDATE_PRODUCT_RESET, CARD_CREATE_RESET } from '../constants';
+import BottomNavBar from '../components/BottomNavBar'; // Import the component
 
 function ProductDetailsPage({ history, match }) {
     const [show, setShow] = useState(false);
@@ -155,7 +156,7 @@ function ProductDetailsPage({ history, match }) {
                                             </Form.Control>
                                         </Form.Group>
                                         <Link 
-                                            to={`/order-now?product=${product.id}&qty=${quantity}&name=${encodeURIComponent(product.name)}`} 
+                                            to={`/order-now?product=${product.id}&qty=${quantity}&name=${encodeURIComponent(product.name)}&price=${product.price}&supplier=${encodeURIComponent(product.supplier_info?.name || '')}&whatsapp=${encodeURIComponent(product.supplier_info?.whatsapp_link || '')}`} 
                                             className="btn btn-success btn-block"
                                         >
                                             Order Now
@@ -169,6 +170,7 @@ function ProductDetailsPage({ history, match }) {
                     </Container>
                 </div>
             )}
+            <BottomNavBar /> {/* Add the BottomNavBar */}
         </div>
     );
 }

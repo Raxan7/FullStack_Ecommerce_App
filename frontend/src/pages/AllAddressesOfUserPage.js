@@ -5,6 +5,7 @@ import { deleteUserAddress, getAllAddress, checkTokenValidation, logout } from '
 import { DELETE_USER_ADDRESS_RESET, GET_SINGLE_ADDRESS_RESET } from '../constants'
 import { useHistory } from 'react-router-dom'
 import CreateAddressComponent from '../components/CreateAddressComponent'
+import BottomNavBar from '../components/BottomNavBar'
 
 
 function AllAddressesOfUserPage() {
@@ -182,6 +183,7 @@ function AllAddressesOfUserPage() {
                 ""
             }
 
+            <BottomNavBar />
         </div >
     )
 }

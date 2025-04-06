@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Container, Row, Col, Card, Button } from 'react-bootstrap'
 import { FaAd, FaArrowRight, FaCheckCircle } from 'react-icons/fa'
 import './css/AdvertisePage.css' // Create this CSS file
+import BottomNavBar from '../components/BottomNavBar'; // Import the component
 
 function AdvertisePage() {
   return (
@@ -84,6 +85,7 @@ function AdvertisePage() {
           </div>
         </Col>
       </Row>
+      <BottomNavBar /> {/* Add the BottomNavBar */}
     </Container>
   )
 }

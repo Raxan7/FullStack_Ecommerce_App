@@ -34,22 +34,12 @@ function NavBar() {
                                 alt="Logo"
                                 style={{ width: '40px', height: '40px', marginRight: '10px' }}
                             />
-                            Home
                         </Navbar.Brand>
                     </LinkContainer>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="mr-auto">
 
-                            {/* All Products */}
-                            <LinkContainer to="/">
-                                <Nav.Link >All Products</Nav.Link>
-                            </LinkContainer>
-
-                            {/* Add these new links */}
-                            <LinkContainer to="/advertise">
-                            <Nav.Link>Advertise</Nav.Link>
-                            </LinkContainer>
                             <LinkContainer to="/help">
                             <Nav.Link>Help</Nav.Link>
                             </LinkContainer>

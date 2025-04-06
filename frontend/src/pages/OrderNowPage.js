@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Form, Button, Container, Alert } from 'react-bootstrap';
 import { useLocation, useHistory } from 'react-router-dom'; // Changed useNavigate to useHistory
 import { createOrderRequest } from '../actions/orderActions';
+import BottomNavBar from '../components/BottomNavBar'; // Import the component
 
 function OrderNowPage() {
     const [formData, setFormData] = useState({
@@ -18,7 +19,13 @@ function OrderNowPage() {
     const history = useHistory(); // Changed navigate to history
     const dispatch = useDispatch();
     const { userInfo } = useSelector(state => state.userLogin || {});
-    const { product } = useSelector(state => state.productDetailsReducer || {});
+
+    const params = new URLSearchParams(location.search);
+
+    const productName = params.get('name') || 'Product';
+    const productPrice = params.get('price') || '0';
+    const supplierName = params.get('supplier') || 'Unknown Supplier';
+    const whatsappLink = params.get('whatsapp') || '';
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -30,14 +37,13 @@ function OrderNowPage() {
         }
 
         // Get order details from URL
-        const params = new URLSearchParams(location.search);
-        const productName = params.get('name') || 'Product';
         const quantity = params.get('qty') || 1;
         const productId = params.get('product');
 
         // Construct WhatsApp message
         const message = `*NEW ORDER REQUEST*%0A%0A` +
                        `*Product:* ${productName}%0A` +
+                       `*Price:* Tsh ${productPrice}%0A` +
                        `*Quantity:* ${quantity}%0A` +
                        `*Customer Name:* ${formData.name}%0A` +
                        `*Delivery Location:*%0A` +
@@ -50,11 +56,10 @@ function OrderNowPage() {
         // Encode the message
         const encodedMessage = encodeURIComponent(message);
 
-        // Use actual WhatsApp number or fallback
-        const whatsappNumber = product?.supplier_info?.whatsapp_number || '255123456789'; // Replace with actual number
-        const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-
-        // Open WhatsApp in a new tab immediately
+        // Use the supplier's WhatsApp link or fallback
+        const whatsappURL = whatsappLink || `https://wa.me/255123456789?text=${encodedMessage}`;
+        
+        // Open WhatsApp in a new tab
         window.open(whatsappURL, '_blank');
 
         // Save to database after opening WhatsApp
@@ -78,6 +83,9 @@ function OrderNowPage() {
         <Container className="py-4">
             <div className="mx-auto" style={{ maxWidth: '600px' }}>
                 <h2 className="text-center mb-4">Complete Your Order</h2>
+                <p><strong>Product:</strong> {productName}</p>
+                <p><strong>Price:</strong> Tsh {productPrice}</p>
+                <p><strong>Supplier:</strong> {supplierName}</p>
                 {showSuccess && (
                     <Alert variant="success" className="text-center">
                         Redirecting to WhatsApp...
@@ -165,6 +173,7 @@ function OrderNowPage() {
                     </Button>
                 </Form>
             </div>
+            <BottomNavBar /> {/* Add the BottomNavBar */}
         </Container>
     );
 }

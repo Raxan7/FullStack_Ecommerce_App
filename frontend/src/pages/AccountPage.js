@@ -6,11 +6,9 @@ import { userDetails, logout, checkTokenValidation } from '../actions/userAction
 //import { UPDATE_USER_ACCOUNT_RESET } from '../constants'
 import Message from '../components/Message'
 import { Spinner } from 'react-bootstrap'
-import {useHistory} from 'react-router-dom'
-
+import { useHistory } from 'react-router-dom'
 
 function AccountPage() {
-
 
     let history = useHistory()
     const dispatch = useDispatch()
@@ -50,14 +48,14 @@ function AccountPage() {
         dispatch(logout())
         history.push("/login")
         window.location.reload()
-      }
+    }
 
     const renderData = () => {
         try {
 
             return (
                 <div>
-                    {loading && <span style = {{ display: "flex" }}><h5>Getting User Information</h5><span className = "ml-2"><Spinner animation="border" /></span></span>}
+                    {loading && <span style={{ display: "flex" }}><h5>Getting User Information</h5><span className="ml-2"><Spinner animation="border" /></span></span>}
                     <Container>
                         <Row className="mr-6 mb-2 border border-dark">
                             <Col xs={2} className="p-3 bg-info text-white">Name:</Col>

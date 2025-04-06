@@ -7,6 +7,7 @@ import { checkTokenValidation, logout } from '../actions/userActions'
 import { CREATE_PRODUCT_RESET } from '../constants'
 import Message from '../components/Message';
 import Loader from '../components/Loader'; // Import a loader component
+import BottomNavBar from '../components/BottomNavBar'; // Import the component
 
 const ProductCreatePage = () => {
 
@@ -215,6 +216,7 @@ const ProductCreatePage = () => {
                     Cancel
                 </Button>
             </Form>
+            <BottomNavBar /> {/* Add the BottomNavBar */}
         </div>
     )
 }

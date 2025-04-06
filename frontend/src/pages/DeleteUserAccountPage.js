@@ -6,7 +6,7 @@ import Message from '../components/Message'
 import { Spinner } from 'react-bootstrap'
 import { useHistory } from "react-router-dom";
 import { DELETE_USER_ACCOUNT_RESET } from '../constants'
-
+import BottomNavBar from '../components/BottomNavBar'; // Import the component
 
 function DeleteUserAccount() {
 
@@ -71,6 +71,7 @@ function DeleteUserAccount() {
                     </div>
                 </Col>
             </Row>
+            <BottomNavBar /> {/* Add the BottomNavBar */}
         </div>
     )
 }

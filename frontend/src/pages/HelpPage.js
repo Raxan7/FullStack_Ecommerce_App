@@ -2,6 +2,7 @@ import React from 'react'
 import { Container, Row, Col, Card, ListGroup, Button } from 'react-bootstrap'
 import { FaPhone, FaWhatsapp, FaEnvelope, FaClock } from 'react-icons/fa'
 import './css/HelpPage.css' // Create this CSS file
+import BottomNavBar from '../components/BottomNavBar'; // Import the component
 
 function HelpPage() {
   const contacts = [
@@ -112,6 +113,7 @@ function HelpPage() {
           </Card>
         </Col>
       </Row>
+      <BottomNavBar /> {/* Add the BottomNavBar */}
     </Container>
   )
 }

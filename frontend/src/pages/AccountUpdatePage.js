@@ -7,7 +7,7 @@ import Message from '../components/Message'
 import { Spinner } from 'react-bootstrap'
 import {useHistory} from 'react-router-dom'
 import { UPDATE_USER_DETAILS_RESET } from '../constants'
-
+import BottomNavBar from '../components/BottomNavBar'
 
 function AccountUpdatePage() {
 
@@ -157,12 +157,15 @@ function AccountUpdatePage() {
                             </Form>
                         </Col>
                     </Row>
+                    <BottomNavBar />
                 </div>
             )
         } catch (error) {
-            return <Message variant='danger'>Something went wrong, go back to <Link
-                onClick={logoutHandler} to={`/login`}
-            > Login</Link> page.</Message>
+            return (
+                <Message variant="danger">
+                    An error occurred. Please <Link onClick={logoutHandler} to={`/login`}>Login</Link> again.
+                </Message>
+            );
         }
     }
 

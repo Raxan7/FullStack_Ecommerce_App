@@ -8,6 +8,7 @@ import { Spinner } from 'react-bootstrap'
 import Message from "../components/Message"
 import DeleteCardComponent from '../components/DeleteCardComponent'
 import { useHistory } from 'react-router-dom'
+import BottomNavBar from '../components/BottomNavBar'
 
 
 const CardDetailsPage = () => {
@@ -142,6 +143,7 @@ const CardDetailsPage = () => {
                     <Message variant='info'>Card details not available.</Message>
                 </div>
             }
+            <BottomNavBar />
         </div>
     )
 }

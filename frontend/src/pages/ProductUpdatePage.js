@@ -7,7 +7,7 @@ import { getProductDetails, updateProduct } from '../actions/productActions'
 import { checkTokenValidation, logout } from '../actions/userActions'
 import { UPDATE_PRODUCT_RESET } from '../constants'
 import Message from '../components/Message'
-
+import BottomNavBar from '../components/BottomNavBar'
 
 const ProductUpdatePage = ({ match }) => {
 
@@ -233,6 +233,7 @@ const ProductUpdatePage = ({ match }) => {
                     Cancel
                 </Button>
             </Form>
+            <BottomNavBar />
         </div>
     )
 }

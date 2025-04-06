@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Table, Button, Row, Col, Container, Spinner, Alert } from 'react-bootstrap'
 import { listPendingAds, approveAd } from '../actions/adActions'
 import { AD_APPROVAL_RESET } from '../constants'
+import BottomNavBar from '../components/BottomNavBar'
 
 function AdApprovalPage({ history }) {
   const dispatch = useDispatch()
@@ -86,6 +87,7 @@ function AdApprovalPage({ history }) {
           </tbody>
         </Table>
       )}
+      <BottomNavBar />
     </Container>
   )
 }

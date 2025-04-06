@@ -10,7 +10,8 @@ import { Spinner } from 'react-bootstrap'
 import { savedCardsList } from '../actions/cardActions'
 import UserAddressComponent from '../components/UserAddressComponent'
 import { checkTokenValidation, logout } from '../actions/userActions'
-import {CHARGE_CARD_RESET} from '../constants/index'
+import { CHARGE_CARD_RESET } from '../constants/index'
+import BottomNavBar from '../components/BottomNavBar'
 
 const CheckoutPage = ({ match }) => {
 
@@ -27,7 +28,7 @@ const CheckoutPage = ({ match }) => {
         }
         setSelectedAddressId(id)
     }
-      
+
     // check token validation reducer
     const checkTokenValidationReducer = useSelector(state => state.checkTokenValidationReducer)
     const { error: tokenError } = checkTokenValidationReducer
@@ -66,7 +67,7 @@ const CheckoutPage = ({ match }) => {
         dispatch(logout())
         history.push("/login")
         window.location.reload()
-      }
+    }
 
     return (
         <div>
@@ -138,6 +139,7 @@ const CheckoutPage = ({ match }) => {
                     </Row>
                 </Container>
             }
+            <BottomNavBar />
         </div>
     )
 }
