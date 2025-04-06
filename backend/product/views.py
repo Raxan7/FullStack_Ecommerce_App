@@ -1,5 +1,5 @@
 import logging
-from .models import Product, Category
+from .models import Product, Category, Supplier  # Ensure Supplier is imported
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -43,20 +43,37 @@ class ProductCreateView(APIView):
         logger.info(f"Incoming request: {request.method} {request.get_full_path()}")
         logger.info(f"Request body: {request.data}")
         data = request.data
+
+        try:
+            category = Category.objects.get(id=data.get("category"))
+        except Category.DoesNotExist:
+            logger.error("Invalid category ID provided.")
+            return Response({"detail": "Invalid category ID."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            supplier = Supplier.objects.get(name=request.user.username)  # Ensure the supplier exists
+        except Supplier.DoesNotExist:
+            logger.error("Supplier does not exist for the logged-in user.")
+            return Response({"detail": "Supplier does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
         product = {
             "name": data.get("name"),
             "description": data.get("description"),
             "price": data.get("price"),
             "stock": data.get("stock"),
             "image": data.get("image"),
+            "category": category.id,
+            "supplier": supplier.id,  # Set the supplier to the valid Supplier object
         }
+
         serializer = ProductSerializer(data=product)
         if serializer.is_valid():
             serializer.save()
             logger.info(f"Product created with ID: {serializer.instance.id}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            logger.error(f"Product creation failed: {serializer.errors}")
+            logger.error(f"Product creation failed. Errors: {serializer.errors}")
+            logger.debug(f"Request data: {request.data}")
             return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 

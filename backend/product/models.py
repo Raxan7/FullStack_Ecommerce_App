@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 class Category(models.Model):
@@ -40,6 +41,10 @@ class Product(models.Model):
         default=get_default_category
     )
     supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True)
+
+    def clean(self):
+        if not self.name or not self.price or not self.category:
+            raise ValidationError("Name, price, and category are required fields.")
 
     def __str__(self):
         return self.name

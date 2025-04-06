@@ -8,6 +8,7 @@ import { useHistory } from 'react-router-dom';
 import { CREATE_PRODUCT_RESET } from '../constants';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import BottomNavBar from '../components/BottomNavBar';
 
 function ProductsListPage() {
     let history = useHistory();
@@ -149,6 +150,9 @@ function ProductsListPage() {
                     )}
                 </Row>
             )}
+
+            {/* Bottom Navigation Bar */}
+            <BottomNavBar />
         </div>
     );
 }

@@ -71,13 +71,11 @@ export const getProductDetails = (id) => async (dispatch) => {
 
 // create product
 export const createProduct = (product) => async (dispatch, getState) => {
-
     try {
         dispatch({
             type: CREATE_PRODUCT_REQUEST
         })
 
-        // login reducer
         const {
             userLoginReducer: { userInfo },
         } = getState()
@@ -89,7 +87,6 @@ export const createProduct = (product) => async (dispatch, getState) => {
             }
         }
 
-        // api call
         const { data } = await axios.post(
             `${API_URL}/api/product-create/`,
             product,
@@ -101,9 +98,12 @@ export const createProduct = (product) => async (dispatch, getState) => {
             payload: data
         })
     } catch (error) {
+        console.error("Error creating product:", error.response ? error.response.data : error.message) // Log error details
         dispatch({
             type: CREATE_PRODUCT_FAIL,
-            payload: error.response && error.response.data.detail ? error.response.data.detail : error.message
+            payload: error.response && error.response.data
+                ? error.response.data
+                : { detail: error.message },
         })
     }
 }

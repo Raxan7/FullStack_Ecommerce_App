@@ -14,7 +14,12 @@ class ProductSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'image', 'supplier_info', 'stock', 'category', 'category_name']
+        fields = ['id', 'name', 'description', 'price', 'image', 'supplier_info', 'stock', 'category', 'category_name', 'supplier']
+        extra_kwargs = {
+            'name': {'required': True},
+            'price': {'required': True},
+            'category': {'required': True},
+        }
     
     def get_supplier_info(self, obj):
         if (obj.supplier):

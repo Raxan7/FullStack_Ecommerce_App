@@ -6,7 +6,7 @@ import { useHistory } from 'react-router'
 import { checkTokenValidation, logout } from '../actions/userActions'
 import { CREATE_PRODUCT_RESET } from '../constants'
 import Message from '../components/Message';
-
+import Loader from '../components/Loader'; // Import a loader component
 
 const ProductCreatePage = () => {
 
@@ -18,6 +18,9 @@ const ProductCreatePage = () => {
     const [price, setPrice] = useState("")
     const [stock, setStock] = useState(false)
     const [image, setImage] = useState(null)
+    const [category, setCategory] = useState("")
+    const [categories, setCategories] = useState([])
+    const [loading, setLoading] = useState(false); // State to manage loader visibility
 
     // login reducer
     const userLoginReducer = useSelector(state => state.userLoginReducer)
@@ -36,39 +39,64 @@ const ProductCreatePage = () => {
             history.push("/login")
         }
         dispatch(checkTokenValidation())
+
+        // Fetch categories from the backend
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/categories/`)
+                const data = await response.json()
+                setCategories(data)
+            } catch (error) {
+                console.error("Failed to fetch categories:", error)
+            }
+        }
+        fetchCategories()
     }, [dispatch, userInfo, history])
 
     const onSubmit = (e) => {
-        e.preventDefault()
+        e.preventDefault();
+        setLoading(true);
 
-        let form_data = new FormData()
-        form_data.append('name', name)
-        form_data.append('description', description)
-        form_data.append('price', price)
-        form_data.append('stock', stock)
-        form_data.append('image', image)
+        let form_data = new FormData();
+        form_data.append('name', name);
+        form_data.append('description', description);
+        form_data.append('price', price);
+        form_data.append('stock', stock);
+        form_data.append('image', image);
+        form_data.append('category', category);
 
-        dispatch(createProduct(form_data))
-    }
+        console.log("Submitting form data:", Object.fromEntries(form_data.entries())); // Log form data for debugging
+
+        dispatch(createProduct(form_data)).finally(() => setLoading(false));
+    };
 
     if (productCreationSuccess) {
-        alert("Product successfully created.")
-        history.push(`/product/${product.id}/`)
+        alert("Product successfully created.");
+        history.push(`/product/${product.id}/`);
         dispatch({
             type: CREATE_PRODUCT_RESET
-        })
+        });
     }
 
     if (userInfo && tokenError === "Request failed with status code 401") {
-        alert("Session expired, please login again.")
-        dispatch(logout())
-        history.push("/login")
-        window.location.reload()
+        alert("Session expired, please login again.");
+        dispatch(logout());
+        history.push("/login");
+        window.location.reload();
     }
 
     return (
         <div>
-            {productCreationError && <Message variant='danger'>{productCreationError.image[0]}</Message>}
+            {loading && <Loader />} {/* Display loader when loading is true */}
+            {productCreationError && (
+                <Message variant='danger'>
+                    {typeof productCreationError === 'string'
+                        ? productCreationError
+                        : productCreationError.image
+                        ? productCreationError.image[0]
+                        : "An error occurred"}
+                </Message>
+            )}
             <span
                 className="d-flex justify-content-center text-info"
                 >
@@ -152,15 +180,34 @@ const ProductCreatePage = () => {
                     </Form.Control>
                 </Form.Group>
 
+                <Form.Group controlId='category'>
+                    <Form.Label>
+                        <b>Category</b>
+                    </Form.Label>
+                    <Form.Control
+                        as="select"
+                        required
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                    >
+                        <option value="">Select Category</option>
+                        {categories.map((cat) => (
+                            <option key={cat.id} value={cat.id}>
+                                {cat.name}
+                            </option>
+                        ))}
+                    </Form.Control>
+                </Form.Group>
+
                 <Button
                     type="submit"
                     variant='success'
                     className="btn-sm button-focus-css"
                 >
-                    Save Product
+                    {loading ? <Loader /> : "Save Product"} {/* Replace text with loader */}
                 </Button>
                 <Button
-                    type="submit"
+                    type="button"
                     variant='primary'
                     className="btn-sm ml-2 button-focus-css"
                     onClick={() => history.push("/")}
