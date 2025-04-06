@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { FaHome, FaSearch, FaCompass, FaBullhorn, FaUser } from 'react-icons/fa';
 
 function BottomNavBar() {
@@ -19,24 +20,34 @@ function BottomNavBar() {
             }}
         >
             <div className="text-center">
-                <FaHome size={24} />
-                <p style={{ fontSize: '0.75rem', margin: 0 }}>Home</p>
+                <Link to="/">
+                    <FaHome size={24} />
+                    <p style={{ fontSize: '0.75rem', margin: 0 }}>Home</p>
+                </Link>
             </div>
             <div className="text-center">
-                <FaSearch size={24} />
-                <p style={{ fontSize: '0.75rem', margin: 0 }}>Search</p>
+                <a href={null}>
+                    <FaSearch size={24} />
+                    <p style={{ fontSize: '0.75rem', margin: 0 }}>Search</p>
+                </a>
             </div>
             <div className="text-center">
-                <FaCompass size={24} />
-                <p style={{ fontSize: '0.75rem', margin: 0 }}>Explore</p>
+                <Link to="/">
+                    <FaCompass size={24} />
+                    <p style={{ fontSize: '0.75rem', margin: 0 }}>Explore</p>
+                </Link>
             </div>
             <div className="text-center">
-                <FaBullhorn size={24} />
-                <p style={{ fontSize: '0.75rem', margin: 0 }}>Advertise</p>
+                <Link to="/advertise">
+                    <FaBullhorn size={24} />
+                    <p style={{ fontSize: '0.75rem', margin: 0 }}>Advertise</p>
+                </Link>
             </div>
             <div className="text-center">
-                <FaUser size={24} />
-                <p style={{ fontSize: '0.75rem', margin: 0 }}>Profile</p>
+                <Link to="/account">
+                    <FaUser size={24} />
+                    <p style={{ fontSize: '0.75rem', margin: 0 }}>Profile</p>
+                </Link>
             </div>
         </div>
     );
