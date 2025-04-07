@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
 from .models import OrderRequest
+from product.models import Product
 from .serializers import OrderRequestSerializer
 
 class CreateOrderRequestView(APIView):
@@ -10,7 +11,8 @@ class CreateOrderRequestView(APIView):
     
     def post(self, request):
         data = request.data.copy()
-        data['user'] = request.user.id
+        # Don't set user ID directly, let the serializer handle it
+        data['user'] = request.user.id  # Remove this line
         
         # Validate required fields
         required_fields = ['name', 'region', 'district', 'ward', 'street', 'product', 'quantity']
@@ -23,26 +25,29 @@ class CreateOrderRequestView(APIView):
             )
         
         try:
-            # Get the product
-            from product.models import Product
             product = Product.objects.get(id=data['product'])
             
-            # Add product details to the order
+            # Generate product details
             data['product_details'] = (
-                f"Order for {data['quantity']} {product.name}(s)\n"
-                f"Product ID: {product.id}\n"
-                f"Unit Price: {product.price}"
+                f"Product: {product.name}\n"
+                f"Quantity: {data['quantity']}\n"
+                f"Unit Price: {product.price}\n"
+                f"Total: {float(product.price) * int(data['quantity'])}"
             )
             
-            serializer = OrderRequestSerializer(data=data)
-            if serializer.is_valid():
-                serializer.save()
+            serializer = OrderRequestSerializer(data=data, context={'request': request})
+            if serializer.is_valid(raise_exception=True):
+                serializer.save(user=request.user)  # Set user here
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
+                
         except Product.DoesNotExist:
             return Response(
                 {'error': 'Product not found'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
 

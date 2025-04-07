@@ -4,6 +4,7 @@ from product.models import Product
 
 class OrderRequestSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    user = serializers.PrimaryKeyRelatedField(read_only=True)  # Add this
     
     class Meta:
         model = OrderRequest
