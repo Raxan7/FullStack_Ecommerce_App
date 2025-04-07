@@ -53,39 +53,33 @@ function OrderNowPage() {
 
         console.log("Order details:", { quantity, productId });
 
-        // Updated WhatsApp message construction in your handleSubmit function
-        const message = `📦 *NEW ORDER REQUEST* 📦%0A%0A` +
-        `🛍️ *Product Details*%0A` +
-        `▫️ *Product:* ${productName}%0A` +
-        `▫️ *Price:* Tsh ${Number(productPrice).toLocaleString()}%0A` +
-        `▫️ *Quantity:* ${quantity}%0A%0A` +
-
-        `👤 *Customer Information*%0A` +
-        `▫️ *Name:* ${formData.name}%0A%0A` +
-
-        `📍 *Delivery Location*%0A` +
-        `🏙️ *Region:* ${formData.region}%0A` +
-        `🏘️ *District:* ${formData.district}%0A` +
-        `🏡 *Ward:* ${formData.ward}%0A` +
-        `📮 *Street:* ${formData.street}%0A%0A` +
-
-        `📝 *Additional Notes*%0A` +
-        `Please confirm this order at your earliest convenience.%0A` +
+        const cleanMessage = 
+        `📦 *NEW ORDER REQUEST* 📦\n\n` +
+        `🛍️ *Product Details*\n` +
+        `▫️ *Product:* ${productName}\n` +
+        `▫️ *Price:* Tsh ${Number(productPrice).toLocaleString()}\n` +
+        `▫️ *Quantity:* ${quantity}\n\n` +
+        `👤 *Customer Information*\n` +
+        `▫️ *Name:* ${formData.name}\n\n` +
+        `📍 *Delivery Location*\n` +
+        `🏙️ *Region:* ${formData.region}\n` +
+        `🏘️ *District:* ${formData.district}\n` +
+        `🏡 *Ward:* ${formData.ward}\n` +
+        `📮 *Street:* ${formData.street}\n\n` +
+        `📝 *Additional Notes*\n` +
+        `Please confirm this order at your earliest convenience.\n` +
         `Thank you! 🙏`;
 
-        // For the price formatting, I added Number(productPrice).toLocaleString() 
-        // to format numbers like 200000 as "200,000"
+        // Create URL-encoded version for WhatsApp
+        const whatsappMessage = encodeURIComponent(cleanMessage.replace(/\n/g, '%0A'));
 
-        console.log("Constructed WhatsApp message:", message);
+        console.log("Formatted Order Message:", cleanMessage); // Clean version for logs
+        console.log("Encoded WhatsApp Message:", whatsappMessage);
 
-        // Encode the message
-        const encodedMessage = encodeURIComponent(message);
-        console.log("Encoded WhatsApp message:", encodedMessage);
-
-        // Use the supplier's WhatsApp link or fallback
+        // Use the supplier's WhatsApp link
         const whatsappURL = whatsappLink 
-            ? `${whatsappLink}?text=${encodedMessage}` 
-            : `https://wa.me/255123456789?text=${encodedMessage}`;
+            ? `${whatsappLink}?text=${whatsappMessage}` 
+            : `https://wa.me/255123456789?text=${whatsappMessage}`;
         
         console.log("WhatsApp URL:", whatsappURL);
 
