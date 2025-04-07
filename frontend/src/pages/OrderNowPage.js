@@ -54,25 +54,29 @@ function OrderNowPage() {
         console.log("Order details:", { quantity, productId });
 
         const cleanMessage = 
-        `📦 *NEW ORDER REQUEST* 📦\n\n` +
-        `🛍️ *Product Details*\n` +
-        `▫️ *Product:* ${productName}\n` +
-        `▫️ *Price:* Tsh ${Number(productPrice).toLocaleString()}\n` +
-        `▫️ *Quantity:* ${quantity}\n\n` +
-        `👤 *Customer Information*\n` +
-        `▫️ *Name:* ${formData.name}\n\n` +
-        `📍 *Delivery Location*\n` +
-        `🏙️ *Region:* ${formData.region}\n` +
-        `🏘️ *District:* ${formData.district}\n` +
-        `🏡 *Ward:* ${formData.ward}\n` +
-        `📮 *Street:* ${formData.street}\n\n` +
-        `📝 *Additional Notes*\n` +
-        `Please confirm this order at your earliest convenience.\n` +
-        `Thank you! 🙏`;
+            `📦 *NEW ORDER REQUEST* 📦
 
-        // Create URL-encoded version for WhatsApp
-        const whatsappMessage = encodeURIComponent(cleanMessage.replace(/\n/g, '%0A'));
+            🛍️ *Product Details*
+            ▫️ *Product:* ${productName}
+            ▫️ *Price:* Tsh ${Number(productPrice).toLocaleString()}
+            ▫️ *Quantity:* ${quantity}
 
+            👤 *Customer Information*
+            ▫️ *Name:* ${formData.name}
+
+            📍 *Delivery Location*
+            🏙️ *Region:* ${formData.region}
+            🏘️ *District:* ${formData.district}
+            🏡 *Ward:* ${formData.ward}
+            📮 *Street:* ${formData.street}
+
+            📝 *Additional Notes*
+            Please confirm this order at your earliest convenience.
+            Thank you! 🙏`;
+
+        // 2. Now create the URL-encoded version for WhatsApp
+        const whatsappMessage = encodeURIComponent(cleanMessage);
+        
         console.log("Formatted Order Message:", cleanMessage); // Clean version for logs
         console.log("Encoded WhatsApp Message:", whatsappMessage);
 
