@@ -72,7 +72,9 @@ function OrderNowPage() {
 
             📝 *Additional Notes*
             Please confirm this order at your earliest convenience.
-            Thank you! 🙏`;
+            Thank you! 🙏
+            
+            Powered by brk_luxe free market`;
 
         // 2. Now create the URL-encoded version for WhatsApp
         const whatsappMessage = encodeURIComponent(cleanMessage);
