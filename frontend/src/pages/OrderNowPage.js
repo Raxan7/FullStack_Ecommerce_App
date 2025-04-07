@@ -76,7 +76,7 @@ function OrderNowPage() {
 
         // 2. Now create the URL-encoded version for WhatsApp
         const whatsappMessage = encodeURIComponent(cleanMessage);
-        
+
         console.log("Formatted Order Message:", cleanMessage); // Clean version for logs
         console.log("Encoded WhatsApp Message:", whatsappMessage);
 
@@ -102,7 +102,7 @@ function OrderNowPage() {
                 user: userInfo.id,
                 product: productId,
                 quantity: quantity,
-                whatsapp_message: message
+                whatsapp_message: whatsappMessage
             }));
             console.log("Order request dispatched successfully.");
         } catch (error) {
