@@ -27,6 +27,9 @@ class Supplier(models.Model):
     @property
     def whatsapp_link(self):
         return f"https://wa.me/{self.whatsapp_number}"
+    
+    def __str__(self):
+        return f"{self.name}"
 
 
 class Product(models.Model):

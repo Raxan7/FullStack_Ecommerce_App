@@ -11,7 +11,7 @@ export const createOrderRequest = (orderData) => async (dispatch, getState) => {
     try {
         dispatch({ type: ORDER_REQUEST_REQUEST });
 
-        const { userLogin: { userInfo } } = getState();
+        const { userLoginReducer: { userInfo } } = getState();
 
         if (!userInfo || !userInfo.token) {
             throw new Error('Authentication required');

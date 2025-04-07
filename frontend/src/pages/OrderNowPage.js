@@ -6,6 +6,8 @@ import { createOrderRequest } from '../actions/orderActions';
 import BottomNavBar from '../components/BottomNavBar'; // Import the component
 
 function OrderNowPage() {
+    console.log("Rendering OrderNowPage...");
+
     const [formData, setFormData] = useState({
         name: '',
         region: '',
@@ -14,24 +16,33 @@ function OrderNowPage() {
         street: '',
     });
     const [showSuccess, setShowSuccess] = useState(false);
-    
+
+    console.log("Initial formData:", formData);
+
     const location = useLocation();
     const history = useHistory(); // Changed navigate to history
     const dispatch = useDispatch();
-    const { userInfo } = useSelector(state => state.userLogin || {});
+    const { userInfo, loading } = useSelector(state => state.userLoginReducer || {});
+    
+
+    console.log("User info:", userInfo);
 
     const params = new URLSearchParams(location.search);
 
     const productName = params.get('name') || 'Product';
     const productPrice = params.get('price') || '0';
     const supplierName = params.get('supplier') || 'Unknown Supplier';
-    const whatsappLink = params.get('whatsapp') || '';
+    const whatsappLink = params.get('whatsapp') || 'No Number';
+
+    console.log("Product details from URL:", { productName, productPrice, supplierName, whatsappLink });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
-        // Redirect to login if not authenticated
-        if (!userInfo) {
+        console.log("Form submitted with formData:", formData);
+
+        // Ensure userInfo is correctly populated
+        if (!loading && (!userInfo || !userInfo.id)) {
+            console.log("User not authenticated. Redirecting to login...");
             history.push(`/login?redirect=/order-now${location.search}`);
             return;
         }
@@ -39,6 +50,8 @@ function OrderNowPage() {
         // Get order details from URL
         const quantity = params.get('qty') || 1;
         const productId = params.get('product');
+
+        console.log("Order details:", { quantity, productId });
 
         // Construct WhatsApp message
         const message = `*NEW ORDER REQUEST*%0A%0A` +
@@ -53,29 +66,48 @@ function OrderNowPage() {
                        `- Street: ${formData.street}%0A%0A` +
                        `Please confirm this order.`;
 
+        console.log("Constructed WhatsApp message:", message);
+
         // Encode the message
         const encodedMessage = encodeURIComponent(message);
+        console.log("Encoded WhatsApp message:", encodedMessage);
 
         // Use the supplier's WhatsApp link or fallback
-        const whatsappURL = whatsappLink || `https://wa.me/255123456789?text=${encodedMessage}`;
+        const whatsappURL = whatsappLink 
+            ? `${whatsappLink}?text=${encodedMessage}` 
+            : `https://wa.me/255123456789?text=${encodedMessage}`;
         
-        // Open WhatsApp in a new tab
-        window.open(whatsappURL, '_blank');
+        console.log("WhatsApp URL:", whatsappURL);
 
-        // Save to database after opening WhatsApp
-        dispatch(createOrderRequest({
-            ...formData,
-            user: userInfo.id,
-            product: productId,
-            quantity: quantity,
-            whatsapp_message: message
-        }));
+        try {
+            // Open WhatsApp in a new tab
+            window.open(whatsappURL, '_blank');
+            console.log("WhatsApp opened successfully.");
+        } catch (error) {
+            console.error("Failed to open WhatsApp:", error);
+        }
+
+        try {
+            // Save to database after opening WhatsApp
+            dispatch(createOrderRequest({
+                ...formData,
+                user: userInfo.id,
+                product: productId,
+                quantity: quantity,
+                whatsapp_message: message
+            }));
+            console.log("Order request dispatched successfully.");
+        } catch (error) {
+            console.error("Failed to dispatch order request:", error);
+        }
 
         setShowSuccess(true);
+        console.log("Show success alert set to true.");
     };
 
     const handleChange = (e) => {
         const { id, value } = e.target;
+        console.log(`Field changed: ${id}, Value: ${value}`);
         setFormData(prev => ({ ...prev, [id]: value }));
     };
 
