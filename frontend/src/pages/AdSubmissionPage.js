@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Form, Button, Row, Col, Container, Spinner, Alert } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
@@ -27,21 +27,42 @@ function AdSubmissionPage() {
     success = false 
   } = useSelector(state => state.adSubmissionReducer || {}) // Note the .adSubmissionReducer
 
+  useEffect(() => {
+    return () => {
+      dispatch({ type: AD_SUBMISSION_RESET }); // Cleanup on unmount
+    };
+  }, [dispatch]);
+
   const submitHandler = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     
-    const formData = new FormData()
-    formData.append('name', name)
-    formData.append('email', email)
-    formData.append('phone_number', phone)
-    formData.append('ad_title', adTitle)
-    formData.append('ad_description', adDescription)
-    formData.append('ad_type', adType)
-    formData.append('ad_file', adFile)
-    formData.append('payment_proof', paymentProof)
-    formData.append('duration_days', 30) // Default to 30 days
+    if (!adFile || !paymentProof) {
+      console.error('Ad file or payment proof is missing.');
+      return;
+    }
+
+    console.log('Submitting ad with the following data:', {
+      name,
+      email,
+      phone,
+      adTitle,
+      adDescription,
+      adType,
+      paymentMethod,
+    });
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('phone_number', phone);
+    formData.append('ad_title', adTitle);
+    formData.append('ad_description', adDescription);
+    formData.append('ad_type', adType);
+    formData.append('ad_file', adFile);
+    formData.append('payment_proof', paymentProof);
+    formData.append('duration_days', 30); // Default to 30 days
     
-    dispatch(submitAd(formData))
+    dispatch(submitAd(formData));
   }
 
   if (success) {

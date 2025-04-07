@@ -16,38 +16,43 @@ import {
 
 export const submitAd = (formData) => async (dispatch, getState) => {
     try {
-        dispatch({ type: AD_SUBMISSION_REQUEST })
+        dispatch({ type: AD_SUBMISSION_REQUEST });
+        console.log('Submitting ad to the server...');
 
         const {
-            userLogin: { userInfo },
-        } = getState()
+            userLoginReducer: { userInfo },
+        } = getState();
 
         const config = {
             headers: {
                 'Content-Type': 'multipart/form-data',
-                Authorization: `Bearer ${userInfo.token}`,
+                Authorization: `Bearer ${userInfo.token}`, // Ensure token is included
             },
-        }
+        };
 
         const { data } = await axios.post(
             '/api/ads/submit/',
             formData,
             config
-        )
+        );
+
+        console.log('Ad submission successful:', data);
 
         dispatch({
             type: AD_SUBMISSION_SUCCESS,
             payload: data,
-        })
+        });
 
     } catch (error) {
+        console.error('Ad submission failed:', error.response || error.message);
+
         dispatch({
             type: AD_SUBMISSION_FAIL,
             payload:
                 error.response && error.response.data.detail
                     ? error.response.data.detail
                     : error.message,
-        })
+        });
     }
 }
 

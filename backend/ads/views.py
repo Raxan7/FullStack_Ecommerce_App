@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.authentication import SessionAuthentication
 from .models import AdCampaign
 from .serializers import AdCampaignSerializer
 from datetime import datetime, timedelta
@@ -10,6 +11,7 @@ from django.conf import settings
 import os
 
 class AdSubmissionView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]  # Use custom CSRF exemption here
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser)
     
@@ -63,7 +65,7 @@ class ActiveAdsView(APIView):
     def get(self, request):
         today = datetime.now().date()
         active_ads = AdCampaign.objects.filter(
-            is_approved=True,
+            is_approved=True,  # Ensure only approved ads
             is_active=True,
             start_date__lte=today,
             end_date__gte=today

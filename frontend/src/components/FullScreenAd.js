@@ -21,21 +21,26 @@ function FullScreenAd() {
   }, [activeAds])  // Added dependency
 
   useEffect(() => {
-    dispatch(listActiveAds())
-    
+    let isMounted = true;
+
+    if (isMounted) {
+      dispatch(listActiveAds());
+    }
+
     const initialTimer = setTimeout(() => {
       if (activeAds && activeAds.length > 0) {
-        setShowAd(true)
+        setShowAd(true);
       }
-    }, 5000)
-    
-    const interval = setInterval(rotateAd, 10000)
-    
+    }, 5000);
+
+    const interval = setInterval(rotateAd, 10000);
+
     return () => {
-      clearTimeout(initialTimer)
-      clearInterval(interval)
-    }
-  }, [dispatch, activeAds, rotateAd])  // Added dependencies
+      isMounted = false; // Cleanup on unmount
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
+  }, [dispatch, activeAds, rotateAd]);  // Added dependencies
 
   if (loading || !activeAds || activeAds.length === 0) {
     return null

@@ -133,7 +133,7 @@ function ProductDetailsPage({ history, match }) {
                                     borderColor: "#C6ACE7",
                                     padding: "2px"
                                 }}>
-                                    Price:<span className="text-success ml-2">Tsh {product.price}</span>
+                                    Price:<span className="text-success ml-2">Tsh {Math.floor(product.price).toLocaleString()}</span>
                                 </span>
                             </Col>
                             <Col sm>

@@ -1,6 +1,7 @@
 # ads/models.py
 from django.db import models
 from account.models import User
+from datetime import datetime
 
 class AdCampaign(models.Model):
     AD_TYPES = (
@@ -26,3 +27,7 @@ class AdCampaign(models.Model):
     
     def __str__(self):
         return self.ad_title
+
+    def is_displayable(self):
+        today = datetime.now().date()
+        return self.is_approved and self.is_active and self.start_date <= today <= self.end_date

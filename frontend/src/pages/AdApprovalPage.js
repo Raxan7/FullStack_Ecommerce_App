@@ -18,18 +18,25 @@ function AdApprovalPage({ history }) {
   const { success: successApprove } = adApproval
 
   useEffect(() => {
-    // Redirect if not admin
-    if (!userInfo || !userInfo.isAdmin) {
-      history.push('/login')
+    let isMounted = true;
+
+    if (isMounted) {
+      if (!userInfo || !userInfo.isAdmin) {
+        history.push('/login');
+      }
+
+      dispatch(listPendingAds());
+
+      if (successApprove) {
+        dispatch({ type: AD_APPROVAL_RESET });
+        dispatch(listPendingAds());
+      }
     }
 
-    dispatch(listPendingAds())
-
-    if (successApprove) {
-      dispatch({ type: AD_APPROVAL_RESET })
-      dispatch(listPendingAds())
-    }
-  }, [dispatch, history, userInfo, successApprove])
+    return () => {
+      isMounted = false; // Cleanup on unmount
+    };
+  }, [dispatch, history, userInfo, successApprove]);
 
   const approveHandler = (id) => {
     if (window.confirm('Are you sure you want to approve this ad?')) {

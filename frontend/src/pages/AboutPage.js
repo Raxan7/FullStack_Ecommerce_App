@@ -30,7 +30,7 @@ function AboutPage() {
         <Col lg={6}>
           <h2 className="mb-4">Our Story</h2>
           <p className="mb-4">
-            Founded in 2023, BRK_LUXE Free Market began with a simple mission: to make shopping 
+            Founded in 2025, BRK_LUXE Free Market began with a simple mission: to make shopping 
             easy, convenient, and enjoyable for everyone in Tanzania. We believe in offering 
             top-quality items at fair prices, with a focus on customer satisfaction and excellent service.
           </p>
