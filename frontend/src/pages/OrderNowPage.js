@@ -53,18 +53,28 @@ function OrderNowPage() {
 
         console.log("Order details:", { quantity, productId });
 
-        // Construct WhatsApp message
-        const message = `*NEW ORDER REQUEST*%0A%0A` +
-                       `*Product:* ${productName}%0A` +
-                       `*Price:* Tsh ${productPrice}%0A` +
-                       `*Quantity:* ${quantity}%0A` +
-                       `*Customer Name:* ${formData.name}%0A` +
-                       `*Delivery Location:*%0A` +
-                       `- Region: ${formData.region}%0A` +
-                       `- District: ${formData.district}%0A` +
-                       `- Ward: ${formData.ward}%0A` +
-                       `- Street: ${formData.street}%0A%0A` +
-                       `Please confirm this order.`;
+        // Updated WhatsApp message construction in your handleSubmit function
+        const message = `📦 *NEW ORDER REQUEST* 📦%0A%0A` +
+        `🛍️ *Product Details*%0A` +
+        `▫️ *Product:* ${productName}%0A` +
+        `▫️ *Price:* Tsh ${Number(productPrice).toLocaleString()}%0A` +
+        `▫️ *Quantity:* ${quantity}%0A%0A` +
+
+        `👤 *Customer Information*%0A` +
+        `▫️ *Name:* ${formData.name}%0A%0A` +
+
+        `📍 *Delivery Location*%0A` +
+        `🏙️ *Region:* ${formData.region}%0A` +
+        `🏘️ *District:* ${formData.district}%0A` +
+        `🏡 *Ward:* ${formData.ward}%0A` +
+        `📮 *Street:* ${formData.street}%0A%0A` +
+
+        `📝 *Additional Notes*%0A` +
+        `Please confirm this order at your earliest convenience.%0A` +
+        `Thank you! 🙏`;
+
+        // For the price formatting, I added Number(productPrice).toLocaleString() 
+        // to format numbers like 200000 as "200,000"
 
         console.log("Constructed WhatsApp message:", message);
 
