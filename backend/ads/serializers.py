@@ -28,3 +28,8 @@ class AdCampaignSerializer(serializers.ModelSerializer):
         if obj.payment_proof:
             return obj.payment_proof.url
         return None
+    
+    def validate_email(self, value):
+        if not value.endswith('@domain.com'):  # Add your domain restriction
+            raise serializers.ValidationError("Invalid email domain")
+        return value

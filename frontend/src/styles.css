@@ -1,0 +1,11 @@
+/* Ensure product cards are responsive and fit smaller screens */
+.product-card {
+    max-width: 100%;
+    padding: 0.5rem;
+}
+
+@media (max-width: 576px) {
+    .product-card {
+        padding: 0.25rem; /* Reduce padding for extra small screens */
+    }
+}

@@ -9,6 +9,11 @@ class AdCampaign(models.Model):
         ('video', 'Video'),
     )
     
+    PAYMENT_METHODS = (
+        ('lipa_namba', 'Lipa Namba'),
+        ('other', 'Other'),
+    )
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     email = models.EmailField()
@@ -18,6 +23,11 @@ class AdCampaign(models.Model):
     ad_type = models.CharField(max_length=10, choices=AD_TYPES)
     ad_file = models.FileField(upload_to='ads/')
     payment_proof = models.ImageField(upload_to='payment_proofs/')
+    payment_method = models.CharField(  # Add this field
+        max_length=20, 
+        choices=PAYMENT_METHODS, 
+        default='lipa_namba'
+    )
     is_approved = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     duration_days = models.IntegerField()

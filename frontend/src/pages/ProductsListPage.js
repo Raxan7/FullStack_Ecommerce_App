@@ -146,8 +146,9 @@ function ProductsListPage() {
                 <Row>
                     {filteredProducts.length > 0 ? (
                         filteredProducts.map(product => (
-                            <Col key={product.id} sm={12} md={6} lg={4} xl={3}>
-                                <div className="mx-2">
+                            <Col key={product.id} xs={6} sm={6} md={4} lg={3} xl={3}>
+                                {/* Ensured xs={6} for two columns on extra small screens */}
+                                <div className="product-card mx-2">
                                     <Product product={{ ...product, price: Math.floor(product.price).toLocaleString() }} />
                                 </div>
                             </Col>

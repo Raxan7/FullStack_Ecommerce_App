@@ -4,7 +4,6 @@ import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
 import { logout } from '../actions/userActions'
 import { useHistory } from "react-router-dom";
-import SearchBarForProducts from './SearchBarForProducts'
 import logo from '../assets/logo.jpeg'; // Import the logo image
 
 function NavBar() {

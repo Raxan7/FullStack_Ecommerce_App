@@ -14,27 +14,25 @@ import {
     PENDING_ADS_FAIL
 } from '../constants'
 
+const API_URL = process.env.REACT_APP_API_BASE_URL;
+
 export const submitAd = (formData) => async (dispatch, getState) => {
     try {
         dispatch({ type: AD_SUBMISSION_REQUEST });
         console.log('Submitting ad to the server...');
 
-        const {
-            userLoginReducer: { userInfo },
-        } = getState();
-
         const config = {
             headers: {
                 'Content-Type': 'multipart/form-data',
-                Authorization: `Bearer ${userInfo.token}`, // Ensure token is included
             },
+            withCredentials: true,
         };
 
         const { data } = await axios.post(
-            '/api/ads/submit/',
+            `${API_URL}/ads/submit/`,
             formData,
             config
-        );
+        );        
 
         console.log('Ad submission successful:', data);
 
@@ -60,19 +58,14 @@ export const approveAd = (id) => async (dispatch, getState) => {
     try {
         dispatch({ type: AD_APPROVAL_REQUEST })
 
-        const {
-            userLogin: { userInfo },
-        } = getState()
-
         const config = {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${userInfo.token}`,
             },
         }
 
         const { data } = await axios.put(
-            `/api/ads/approve/${id}/`,
+            `${API_URL}/ads/approve/${id}/`,
             {},
             config
         )
@@ -97,7 +90,7 @@ export const listActiveAds = () => async (dispatch) => {
     try {
         dispatch({ type: ACTIVE_ADS_REQUEST })
 
-        const { data } = await axios.get('/api/ads/active/')
+        const { data } = await axios.get(`${API_URL}/ads/active/`)
 
         dispatch({
             type: ACTIVE_ADS_SUCCESS,
@@ -119,18 +112,13 @@ export const listPendingAds = () => async (dispatch, getState) => {
     try {
       dispatch({ type: PENDING_ADS_REQUEST })
   
-      const {
-        userLogin: { userInfo },
-      } = getState()
-  
       const config = {
         headers: {
-          Authorization: `Bearer ${userInfo.token}`,
         },
       }
   
       const { data } = await axios.get(
-        '/api/ads/pending/',
+        `${API_URL}/ads/pending/`,
         config
       )
   
