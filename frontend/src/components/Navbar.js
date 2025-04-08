@@ -63,10 +63,6 @@ function NavBar() {
                                 </LinkContainer>
                             )}
 
-                                <span className="">
-                                    <SearchBarForProducts />
-                                </span>
-
                         </Nav>
 
                         {/* login-logout condition here */}

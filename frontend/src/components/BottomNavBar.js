@@ -43,22 +43,17 @@ function BottomNavBar() {
                     </Link>
                 </div>
                 <div className="text-center">
-                    <button
-                        className="nav-link"
-                        onClick={() => {
-                            // Handle click event
-                        }}
+                    <Link
+                        to="/search"
+                        onClick={() => handleTabClick('/search')}
                         style={{
-                            background: 'none',
-                            border: 'none',
-                            padding: 0,
-                            color: 'black',
-                            cursor: 'pointer',
+                            color: activeTab === '/search' ? 'blue' : 'black',
+                            textDecoration: 'none',
                         }}
                     >
                         <FaSearch size={24} />
                         <p style={{ fontSize: '0.75rem', margin: 0 }}>Search</p>
-                    </button>
+                    </Link>
                 </div>
                 <div className="text-center">
                     <Link

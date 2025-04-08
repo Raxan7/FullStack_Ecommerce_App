@@ -27,6 +27,7 @@ import AdApprovalPage from './pages/AdApprovalPage'
 import HelpPage from './pages/HelpPage'
 import AboutPage from './pages/AboutPage'
 import OrderNowPage from './pages/OrderNowPage'
+import SearchPage from './pages/SearchPage';
 
 
 const App = () => {
@@ -61,6 +62,8 @@ const App = () => {
             <Route path="/help" component={HelpPage} exact />
             <Route path="/about" component={AboutPage} exact />
             <Route path="/order-now" component={OrderNowPage} exact />
+
+            <Route path="/search" component={SearchPage} exact />
 
             <Route path="" component={NotFound} exact />
           </Switch>
