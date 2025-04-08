@@ -4,6 +4,7 @@ import { Form, Button, Row, Col, Container, Spinner, Alert } from 'react-bootstr
 import { useHistory } from 'react-router-dom'
 import { submitAd } from '../actions/adActions'
 import { AD_SUBMISSION_RESET } from '../constants'
+import paymentInstructions from '../assets/lipa_namba.jpeg';
 
 function AdSubmissionPage() {
   const [name, setName] = useState('')
@@ -16,6 +17,7 @@ function AdSubmissionPage() {
   const [paymentProof, setPaymentProof] = useState(null)
   const [agreement, setAgreement] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState('lipa_namba')
+  
 
   const dispatch = useDispatch()
   const history = useHistory()
@@ -154,6 +156,17 @@ function AdSubmissionPage() {
                 accept={adType === 'image' ? 'image/*' : 'video/*'}
                 required
               />
+            </Form.Group>
+
+            <Form.Group controlId="paymentInstructions">
+              <Form.Label>Payment Instructions</Form.Label>
+              <div className="text-center">
+                <img 
+                  src={paymentInstructions} 
+                  alt="Payment Instructions" 
+                  className="img-fluid" 
+                />
+              </div>
             </Form.Group>
 
             <Form.Group controlId="paymentMethod">
