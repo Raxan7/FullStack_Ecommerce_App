@@ -62,32 +62,12 @@ function AboutPage() {
         <Col className="text-center">
           <Card className="border-0 shadow-sm py-4">
             <Card.Body>
-              <h3 className="mb-4">Meet The Founders</h3>
+              <h3 className="mb-4">Meet The Founder</h3>
               <Row className="justify-content-center">
-                <Col md={4} className="mb-4">
+                <Col md={6} className="mb-4">
                   <div className="team-member">
-                    <div className="team-img mb-3 rounded-circle overflow-hidden">
-                      <img 
-                        src="https://via.placeholder.com/150" 
-                        alt="Founder" 
-                        className="img-fluid"
-                      />
-                    </div>
-                    <h5>[Your Name]</h5>
-                    <p className="text-muted">Co-Founder & [Your Profession]</p>
-                  </div>
-                </Col>
-                <Col md={4} className="mb-4">
-                  <div className="team-member">
-                    <div className="team-img mb-3 rounded-circle overflow-hidden">
-                      <img 
-                        src="https://via.placeholder.com/150" 
-                        alt="Co-Founder" 
-                        className="img-fluid"
-                      />
-                    </div>
-                    <h5>[Co-Founder Name]</h5>
-                    <p className="text-muted">Co-Founder & [Profession]</p>
+                    <h5>Boniventure Richard Kisse</h5>
+                    <p className="text-muted">Founder</p>
                   </div>
                 </Col>
               </Row>
