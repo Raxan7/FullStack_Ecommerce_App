@@ -93,7 +93,9 @@ function ProductsListPage() {
                                 fontWeight: '600',
                                 borderRadius: '50px',
                                 boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-                                transition: 'all 0.3s ease'
+                                transition: 'all 0.3s ease',
+                                backgroundColor: 'black', // Updated button background color to black
+                                borderColor: 'black' // Ensure border matches the background color
                             }}
                             onMouseOver={(e) => {
                                 e.target.style.transform = 'translateY(-2px)';
