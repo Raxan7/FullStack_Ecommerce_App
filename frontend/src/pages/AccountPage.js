@@ -7,6 +7,7 @@ import { userDetails, logout, checkTokenValidation } from '../actions/userAction
 import Message from '../components/Message'
 import { Spinner } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
+import BottomNavBar from '../components/BottomNavBar' // Import the BottomNavBar component
 
 function AccountPage() {
 
@@ -87,7 +88,12 @@ function AccountPage() {
     }
 
 
-    return renderData()
+    return (
+        <>
+            {renderData()}
+            <BottomNavBar /> {/* Add the BottomNavBar component */}
+        </>
+    )
 
 }
 

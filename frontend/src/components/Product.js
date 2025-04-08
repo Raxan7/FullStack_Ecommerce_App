@@ -12,7 +12,7 @@ function Product({ product }) {
         <div>
             <Card className="mb-4 rounded">
                 <Card.Body>
-                    <Link to={`/product/${product.id}`}>
+                    <Link to={`/product/${product.id}`} style={{ color: 'black' }}>
                         <Card.Img 
                             variant="top" 
                             src={imageUrl} 
@@ -23,7 +23,7 @@ function Product({ product }) {
                             }}
                         />
                     </Link>
-                    <Link to={`/product/${product.id}`}>
+                    <Link to={`/product/${product.id}`} style={{ color: 'black' }}>
                         <Card.Title as="div">
                             <strong>{product.name}</strong>
                         </Card.Title>

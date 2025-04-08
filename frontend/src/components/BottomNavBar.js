@@ -1,8 +1,15 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { FaHome, FaSearch, FaCompass, FaBullhorn, FaUser } from 'react-icons/fa';
 
 function BottomNavBar() {
+    const location = useLocation(); // Get the current route
+    const [activeTab, setActiveTab] = useState(location.pathname); // Track the active tab
+
+    const handleTabClick = (tab) => {
+        setActiveTab(tab);
+    };
+
     return (
         <>
             <div style={{ height: '4rem' }}></div> {/* Spacer to account for the navbar height */}
@@ -23,7 +30,14 @@ function BottomNavBar() {
                 }}
             >
                 <div className="text-center">
-                    <Link to="/">
+                    <Link
+                        to="/"
+                        onClick={() => handleTabClick('/')}
+                        style={{
+                            color: activeTab === '/' ? 'blue' : 'black',
+                            textDecoration: 'none',
+                        }}
+                    >
                         <FaHome size={24} />
                         <p style={{ fontSize: '0.75rem', margin: 0 }}>Home</p>
                     </Link>
@@ -34,26 +48,53 @@ function BottomNavBar() {
                         onClick={() => {
                             // Handle click event
                         }}
-                        style={{ background: 'none', border: 'none', padding: 0, color: 'inherit', cursor: 'pointer' }}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            color: 'black',
+                            cursor: 'pointer',
+                        }}
                     >
                         <FaSearch size={24} />
                         <p style={{ fontSize: '0.75rem', margin: 0 }}>Search</p>
                     </button>
                 </div>
                 <div className="text-center">
-                    <Link to="/">
+                    <Link
+                        to="/"
+                        onClick={() => handleTabClick('/explore')}
+                        style={{
+                            color: activeTab === '/explore' ? 'blue' : 'black',
+                            textDecoration: 'none',
+                        }}
+                    >
                         <FaCompass size={24} />
                         <p style={{ fontSize: '0.75rem', margin: 0 }}>Explore</p>
                     </Link>
                 </div>
                 <div className="text-center">
-                    <Link to="/advertise">
+                    <Link
+                        to="/advertise"
+                        onClick={() => handleTabClick('/advertise')}
+                        style={{
+                            color: activeTab === '/advertise' ? 'blue' : 'black',
+                            textDecoration: 'none',
+                        }}
+                    >
                         <FaBullhorn size={24} />
                         <p style={{ fontSize: '0.75rem', margin: 0 }}>Advertise</p>
                     </Link>
                 </div>
                 <div className="text-center">
-                    <Link to="/account">
+                    <Link
+                        to="/account"
+                        onClick={() => handleTabClick('/account')}
+                        style={{
+                            color: activeTab === '/account' ? 'blue' : 'black',
+                            textDecoration: 'none',
+                        }}
+                    >
                         <FaUser size={24} />
                         <p style={{ fontSize: '0.75rem', margin: 0 }}>Profile</p>
                     </Link>

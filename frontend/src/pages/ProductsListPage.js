@@ -123,6 +123,11 @@ function ProductsListPage() {
                             variant={selectedCategory === category ? 'primary' : 'outline-primary'}
                             onClick={() => setSelectedCategory(category)}
                             className="mx-1 mb-2 rounded-pill"
+                            style={{
+                                backgroundColor: selectedCategory === category ? 'black' : 'transparent', // Black for selected
+                                color: selectedCategory === category ? 'white' : 'black', // White text for selected
+                                borderColor: 'black' // Black border for all buttons
+                            }}
                         >
                             {category}
                         </Button>
