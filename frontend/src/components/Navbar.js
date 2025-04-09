@@ -48,7 +48,7 @@ function NavBar() {
 
                             {/* New Product (Admins Only) */}
 
-                            {userInfo && userInfo.admin ?
+                            {userInfo ?
                                 <LinkContainer to="/new-product/">
                                     <Nav.Link >Add Product</Nav.Link>
                                 </LinkContainer>
