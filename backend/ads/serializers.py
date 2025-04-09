@@ -16,8 +16,13 @@ class AdCampaignSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             'is_approved', 'is_active', 'start_date', 'end_date', 
-            'created_at', 'ad_file_url', 'payment_proof_url'
+            'created_at', 'ad_file_url', 'payment_proof_url'  # Removed 'user' from here
         ]
+
+    def create(self, validated_data):
+        # Ensure the user is set from the request
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
     
     def get_ad_file_url(self, obj):
         if obj.ad_file:
@@ -30,6 +35,4 @@ class AdCampaignSerializer(serializers.ModelSerializer):
         return None
     
     def validate_email(self, value):
-        if not value.endswith('@domain.com'):  # Add your domain restriction
-            raise serializers.ValidationError("Invalid email domain")
         return value

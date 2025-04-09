@@ -6,6 +6,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.authentication import BasicAuthentication  # Import if needed
 from rest_framework.authentication import TokenAuthentication  # Import if needed
+from rest_framework_simplejwt.authentication import JWTAuthentication  # Import JWTAuthentication
 from .models import AdCampaign
 from .serializers import AdCampaignSerializer
 from datetime import datetime, timedelta
@@ -22,14 +23,16 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 class AdSubmissionView(APIView):
+    authentication_classes = [JWTAuthentication]
     throttle_classes = [AnonRateThrottle]
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [permissions.IsAuthenticated]  # Add this to ensure user is authenticated
     
     def post(self, request):
         data = request.data.copy()
         
-        # Debug: Print received data
-        print("Received data:", {k: v for k, v in data.items() if k not in ['ad_file', 'payment_proof']})
+        # Add the authenticated user to the data
+        data['user'] = request.user.id
         
         try:
             # Set default duration
@@ -40,13 +43,14 @@ class AdSubmissionView(APIView):
             data['start_date'] = today
             data['end_date'] = today + timedelta(days=duration_days)
             
-            serializer = AdCampaignSerializer(data=data)
+            serializer = AdCampaignSerializer(
+                data=data,
+                context={'request': request})
             
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             
-            # Return detailed validation errors
             return Response({
                 'status': 'error',
                 'errors': serializer.errors,

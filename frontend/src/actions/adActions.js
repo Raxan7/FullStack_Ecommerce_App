@@ -21,9 +21,17 @@ export const submitAd = (formData) => async (dispatch, getState) => {
         dispatch({ type: AD_SUBMISSION_REQUEST });
         console.log('Submitting ad to the server...');
 
+        const { userLoginReducer } = getState();
+        const { userInfo } = userLoginReducer;
+        
+        if (!userInfo) {
+            throw new Error('Please login to submit an ad');
+        }
+
         const config = {
             headers: {
                 'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${userInfo.token || userInfo.access}`, // Try both
             },
             withCredentials: true,
         };

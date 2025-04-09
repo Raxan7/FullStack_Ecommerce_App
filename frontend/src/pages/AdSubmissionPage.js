@@ -5,12 +5,12 @@ import { useHistory } from 'react-router-dom'
 import { submitAd } from '../actions/adActions'
 import { AD_SUBMISSION_RESET } from '../constants'
 import paymentInstructions from '../assets/lipa_namba.jpeg';
-import BottomNavBar from '../components/BottomNavBar'; // Import BottomNavBar
+import BottomNavBar from '../components/BottomNavBar';
 
 function AdSubmissionPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('') // Define phone state
+  const [phone, setPhone] = useState('')
   const [adTitle, setAdTitle] = useState('')
   const [adDescription, setAdDescription] = useState('')
   const [adType, setAdType] = useState('image')
@@ -19,52 +19,67 @@ function AdSubmissionPage() {
   const [agreement, setAgreement] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState('lipa_namba')
   
-
   const dispatch = useDispatch()
   const history = useHistory()
 
+  // Match the same pattern as NavBar for authentication
+  const { userInfo } = useSelector(state => state.userLoginReducer)
   const { 
     loading = false, 
     error = null, 
     success = false 
-  } = useSelector(state => state.adSubmissionReducer || {}) // Note the .adSubmissionReducer
+  } = useSelector(state => state.adSubmissionReducer || {})
 
-  const { userInfo } = useSelector(state => state.userLoginReducer || {}); // Retrieve user info from Redux store
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!userInfo) {
+      history.push('/login')
+    }
+  }, [userInfo, history])
 
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      dispatch({ type: AD_SUBMISSION_RESET }); // Cleanup on unmount
-    };
-  }, [dispatch]);
+      dispatch({ type: AD_SUBMISSION_RESET })
+    }
+  }, [dispatch])
 
   const submitHandler = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     
-    const formData = new FormData();
-    // Use EXACT field names that match your Django model
-    formData.append('name', name);
-    formData.append('email', email);
-    formData.append('phone_number', phone);  // Changed from 'phone'
-    formData.append('ad_title', adTitle);    // Changed from 'adTitle'
-    formData.append('ad_description', adDescription); // Changed from 'adDescription'
-    formData.append('ad_type', adType);      // Changed from 'adType'
-    formData.append('payment_method', paymentMethod);
-    formData.append('duration_days', 30);
-    formData.append('ad_file', adFile);
-    formData.append('payment_proof', paymentProof);
-
-    // Debug: Log the final form data
-    for (let [key, value] of formData.entries()) {
-        console.log('Final FormData:', key, value);
+    if (!userInfo) {
+      return
     }
 
-    dispatch(submitAd(formData));
+    const formData = new FormData()
+    formData.append('name', name)
+    formData.append('email', email)
+    formData.append('phone_number', phone)
+    formData.append('ad_title', adTitle)
+    formData.append('ad_description', adDescription)
+    formData.append('ad_type', adType)
+    formData.append('payment_method', paymentMethod)
+    formData.append('duration_days', 30)
+    formData.append('ad_file', adFile)
+    formData.append('payment_proof', paymentProof)
+
+    dispatch(submitAd(formData))
   }
 
   if (success) {
     dispatch({ type: AD_SUBMISSION_RESET })
     history.push('/')
     return null
+  }
+
+  if (!userInfo) {
+    return (
+      <Container className="text-center my-5">
+        <Spinner animation="border" role="status">
+          <span className="sr-only">Redirecting to login...</span>
+        </Spinner>
+      </Container>
+    )
   }
 
   return (
@@ -95,7 +110,6 @@ function AdSubmissionPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
                 />
               </Form.Group>
 
@@ -205,6 +219,7 @@ function AdSubmissionPage() {
                 variant="primary" 
                 type="submit" 
                 disabled={loading || !agreement}
+                className="mb-5"
               >
                 {loading ? (
                   <>
@@ -223,7 +238,7 @@ function AdSubmissionPage() {
           </Col>
         </Row>
       </Container>
-      <BottomNavBar /> {/* Add BottomNavBar */}
+      <BottomNavBar />
     </>
   )
 }

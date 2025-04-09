@@ -96,3 +96,32 @@
     transform: rotate(360deg);
   }
 }
+
+
+/* Ad Slider Styles */
+.carousel {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  width: 5%;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  height: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  opacity: 1;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  filter: brightness(0) invert(1);
+}
