@@ -31,7 +31,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["fullstack-ecommerce-app-backend-x04s.onrender.com", "localhost", "luxefreemarket.com"]
+ALLOWED_HOSTS = ["fullstack-ecommerce-app-backend-x04s.onrender.com", "localhost", "api.luxefreemarket.com", "www.api.luxefreemarket.com"]
 
 
 # Application definition
