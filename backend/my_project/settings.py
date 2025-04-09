@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 from datetime import timedelta
 import dj_database_url
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*7!!kc@bmtx8ngui6lr@xmifmcwm6y%hnbe)rdei(b!ds8t)uq'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -95,10 +96,25 @@ WSGI_APPLICATION = 'my_project.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': dj_database_url.parse("postgresql://manyerere201:exHjyP9UQFX0@ep-shy-mud-a5gs0r74.us-east-2.aws.neon."
+#                                      "tech/brk_market?sslmode=require")
+# }
+
 DATABASES = {
-    'default': dj_database_url.parse("postgresql://manyerere201:exHjyP9UQFX0@ep-shy-mud-a5gs0r74.us-east-2.aws.neon."
-                                     "tech/brk_market?sslmode=require")
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config('DB_NAME'),  # Database name from .env
+        'USER': config('DB_USER'),  # Database username from .env
+        'PASSWORD': config('DB_PASSWORD'),  # Database password from .env
+        'HOST': config('DB_HOST', default='localhost'),  # Database host from .env
+        'PORT': config('DB_PORT', default='3306'),  # Database port from .env
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
+    }
 }
+
 
 
 # Password validation
