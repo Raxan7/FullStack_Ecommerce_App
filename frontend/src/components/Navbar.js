@@ -48,7 +48,7 @@ function NavBar() {
 
                             {/* New Product (Admins Only) */}
 
-                            {userInfo ?
+                            {userInfo && userInfo.isAdmin ?
                                 <LinkContainer to="/new-product/">
                                     <Nav.Link >Add Product</Nav.Link>
                                 </LinkContainer>
@@ -56,11 +56,11 @@ function NavBar() {
                             }
 
                             {/* Admin-only links (if user is admin) */}
-                            {userInfo && userInfo.isAdmin && (
+                            {/* {userInfo && userInfo.isAdmin && (
                                 <LinkContainer to="/ad-approval">
                                     <Nav.Link>Approve Ads</Nav.Link>
                                 </LinkContainer>
-                            )}
+                            )} */}
 
                         </Nav>
 
