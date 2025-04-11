@@ -16,7 +16,7 @@ class TestStripeImplementation(APIView):
 
 # Check token expired or not
 class CheckTokenValidation(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = []
 
     def get(self, request):
         return Response("Token is Valid", status=status.HTTP_200_OK)
