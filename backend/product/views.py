@@ -37,7 +37,7 @@ class ProductDetailView(APIView):
 
 
 class ProductCreateView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = []
 
     def post(self, request):
         logger.info(f"Incoming request: {request.method} {request.get_full_path()}")
