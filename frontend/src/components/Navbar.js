@@ -4,7 +4,7 @@ import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
 import { logout } from '../actions/userActions'
 import { useHistory } from "react-router-dom";
-import logo from '../assets/logo.jpeg'; // Import the logo image
+import logo from '../assets/logo.jpeg';
 
 function NavBar() {
 
@@ -48,7 +48,7 @@ function NavBar() {
 
                             {/* New Product (Admins Only) */}
 
-                            {userInfo && userInfo.isAdmin ?
+                            {userInfo && userInfo.admin ?
                                 <LinkContainer to="/new-product/">
                                     <Nav.Link >Add Product</Nav.Link>
                                 </LinkContainer>

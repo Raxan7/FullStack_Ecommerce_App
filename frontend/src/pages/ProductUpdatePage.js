@@ -29,6 +29,7 @@ const ProductUpdatePage = ({ match }) => {
     const [price, setPrice] = useState("")
     const [stock, setStock] = useState(product.stock)
     const [image, setImage] = useState("")
+    const [newImages, setNewImages] = useState([]);
 
     let history = useHistory()
     const dispatch = useDispatch()
@@ -63,14 +64,23 @@ const ProductUpdatePage = ({ match }) => {
     const onSubmit = (e) => {
         e.preventDefault()
         const productId = product.id
-        let form_data = new FormData()
-        form_data.append('name', name)
-        form_data.append('description', description)
-        form_data.append('price', price)
-        form_data.append('stock', stock)
-        form_data.append('image', image)
+        let formData = new FormData()
+        formData.append('name', name || product.name);  // Fallback to existing value
+        formData.append('description', description || product.description);
+        formData.append('price', price || product.price);
+        formData.append('stock', stock);
 
-        dispatch(updateProduct(productId, form_data))
+        // Handle single image (backward compatibility)
+        if (image) {
+            formData.append('image', image);
+        }
+        
+        // Handle multiple images
+        newImages.forEach((img) => {
+            formData.append('images', img);
+        });
+
+        dispatch(updateProduct(product.id, formData));
     }
 
     if (productUpdationSuccess) {
@@ -157,6 +167,20 @@ const ProductUpdatePage = ({ match }) => {
                             </span>
                         </p>
                     }
+                </Form.Group>
+                
+                <Form.Group controlId='newImages'>
+                    <Form.Label>
+                        <b>Additional Images</b>
+                    </Form.Label>
+                    <Form.Control
+                        type="file"
+                        multiple
+                        onChange={(e) => setNewImages([...e.target.files])}
+                    />
+                    <Form.Text className="text-muted">
+                        Add more images (optional)
+                    </Form.Text>
                 </Form.Group>
 
                 <Form.Group controlId='name'>

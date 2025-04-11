@@ -72,19 +72,21 @@ export const getProductDetails = (id) => async (dispatch) => {
 // create product
 export const createProduct = (product) => async (dispatch, getState) => {
     try {
-        dispatch({
-            type: CREATE_PRODUCT_REQUEST
-        })
+        dispatch({ type: CREATE_PRODUCT_REQUEST })
 
-        const {
-            userLoginReducer: { userInfo },
-        } = getState()
+        const { userLoginReducer } = getState();
+        const { userInfo } = userLoginReducer;
+
+        if (!userInfo) {
+            throw new Error('Please login to create a product');
+        }
 
         const config = {
             headers: {
-                "Content-Type": "multipart/form-data",
-                Authorization: `Bearer ${userInfo.token}`
-            }
+                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${userInfo.token || userInfo.access}`,
+            },
+            withCredentials: true,
         }
 
         const { data } = await axios.post(
@@ -97,8 +99,9 @@ export const createProduct = (product) => async (dispatch, getState) => {
             type: CREATE_PRODUCT_SUCCESS,
             payload: data
         })
+
     } catch (error) {
-        console.error("Error creating product:", error.response ? error.response.data : error.message) // Log error details
+        console.error("Error creating product:", error.response ? error.response.data : error.message)
         dispatch({
             type: CREATE_PRODUCT_FAIL,
             payload: error.response && error.response.data
@@ -108,83 +111,79 @@ export const createProduct = (product) => async (dispatch, getState) => {
     }
 }
 
-// delete product
-export const deleteProduct = (id) => async (dispatch, getState) => {
-    try {
-        dispatch({
-            type: DELETE_PRODUCT_REQUEST
-        })
 
-        // login reducer
-        const {
-            userLoginReducer: { userInfo },
-        } = getState()
-
-        const config = {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${userInfo.token}`
-            }
-        }
-
-        // api call
-        const { data } = await axios.delete(
-            `${API_URL}/api/product-delete/${id}/`,
-            config
-        )
-
-        dispatch({
-            type: DELETE_PRODUCT_SUCCESS,
-            payload: data
-        })
-
-    } catch (error) {
-        dispatch({
-            type: DELETE_PRODUCT_FAIL,
-            payload: error.response && error.response.data.detail ? error.response.data.detail : error.message
-        })
-    }
-}
-
-// update product
+// Update Product Action
 export const updateProduct = (id, product) => async (dispatch, getState) => {
-
     try {
-        dispatch({
-            type: UPDATE_PRODUCT_REQUEST
-        })
+        dispatch({ type: UPDATE_PRODUCT_REQUEST });
 
-        // login reducer
-        const {
-            userLoginReducer: { userInfo },
-        } = getState()
+        const { userLoginReducer } = getState();
+        const { userInfo } = userLoginReducer;
+
+        if (!userInfo) {
+            throw new Error('Please login to update a product');
+        }
 
         const config = {
             headers: {
-                "Content-Type": "multipart/form-data",
-                Authorization: `Bearer ${userInfo.token}`
-            }
-        }
+                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${userInfo.token || userInfo.access}`,
+            },
+            withCredentials: true,
+        };
 
-        // api call
         const { data } = await axios.put(
             `${API_URL}/api/product-update/${id}/`,
             product,
             config
-        )
+        );
 
         dispatch({
             type: UPDATE_PRODUCT_SUCCESS,
-            payload: data
-        })
+            payload: data,
+        });
 
     } catch (error) {
         dispatch({
             type: UPDATE_PRODUCT_FAIL,
-            payload: error.response && error.response.data.detail ? error.response.data.detail : error.message
-        })
+            payload: error.response?.data || { detail: error.message },
+        });
     }
-}
+};
+
+// Delete Product Action
+export const deleteProduct = (id) => async (dispatch, getState) => {
+    try {
+        dispatch({ type: DELETE_PRODUCT_REQUEST });
+
+        const { userLoginReducer } = getState();
+        const { userInfo } = userLoginReducer;
+
+        if (!userInfo) {
+            throw new Error('Please login to delete a product');
+        }
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${userInfo.token || userInfo.access}`,
+            },
+            withCredentials: true,
+        };
+
+        await axios.delete(
+            `${API_URL}/api/product-delete/${id}/`,
+            config
+        );
+
+        dispatch({ type: DELETE_PRODUCT_SUCCESS });
+
+    } catch (error) {
+        dispatch({
+            type: DELETE_PRODUCT_FAIL,
+            payload: error.response?.data || { detail: error.message },
+        });
+    }
+};
 
 
 // change ordered product delivery status

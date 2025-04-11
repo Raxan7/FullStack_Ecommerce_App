@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
 from .serializers import ProductSerializer, CategorySerializer
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.parsers import MultiPartParser, FormParser
 
 logger = logging.getLogger(__name__)
 
@@ -36,90 +38,107 @@ class ProductDetailView(APIView):
             return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
+# product/views.py
 class ProductCreateView(APIView):
-    permission_classes = []
+    permission_classes = [permissions.IsAdminUser]
+    authentication_classes = [JWTAuthentication]
+    parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request):
-        logger.info(f"Incoming request: {request.method} {request.get_full_path()}")
-        logger.info(f"Request body: {request.data}")
-        data = request.data
+        logger.info(f"User making request: {request.user}")
+        data = request.data.copy()
 
         try:
             category = Category.objects.get(id=data.get("category"))
-        except Category.DoesNotExist:
-            logger.error("Invalid category ID provided.")
-            return Response({"detail": "Invalid category ID."}, status=status.HTTP_400_BAD_REQUEST)
+            supplier = Supplier.objects.get(name=request.user.username)
 
-        try:
-            supplier = Supplier.objects.get(name=request.user.username)  # Ensure the supplier exists
-        except Supplier.DoesNotExist:
-            logger.error("Supplier does not exist for the logged-in user.")
-            return Response({"detail": "Supplier does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+            product_data = {
+                "name": data.get("name"),
+                "description": data.get("description"),
+                "price": data.get("price"),
+                "stock": data.get("stock", False),
+                "category": category.id,
+                "supplier": supplier.id,
+            }
 
-        product = {
-            "name": data.get("name"),
-            "description": data.get("description"),
-            "price": data.get("price"),
-            "stock": data.get("stock"),
-            "image": data.get("image"),
-            "category": category.id,
-            "supplier": supplier.id,  # Set the supplier to the valid Supplier object
-        }
+            # Handle single image (backward compatibility)
+            if 'image' in request.FILES:
+                product_data['image'] = request.FILES['image']
 
-        serializer = ProductSerializer(data=product)
-        if serializer.is_valid():
-            serializer.save()
-            logger.info(f"Product created with ID: {serializer.instance.id}")
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            logger.error(f"Product creation failed. Errors: {serializer.errors}")
-            logger.debug(f"Request data: {request.data}")
-            return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ProductDeleteView(APIView):
-    permission_classes = [permissions.IsAdminUser]
-
-    def delete(self, request, pk):
-        logger.info(f"Incoming request: {request.method} {request.get_full_path()}")
-        logger.info(f"Deleting product with ID: {pk}")
-        try:
-            product = Product.objects.get(id=pk)
-            product.delete()
-            logger.info(f"Product with ID {pk} successfully deleted.")
-            return Response({"detail": "Product successfully deleted."}, status=status.HTTP_204_NO_CONTENT)
-        except Product.DoesNotExist:
-            logger.error(f"Product with ID {pk} not found.")
-            return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
-
+            serializer = ProductSerializer(data=product_data, context={'request': request})
+            
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ProductEditView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAdminUser]
+    parser_classes = (MultiPartParser, FormParser)
 
     def put(self, request, pk):
-        logger.info(f"Incoming request: {request.method} {request.get_full_path()}")
-        logger.info(f"Request body: {request.data}")
-        logger.info(f"Editing product with ID: {pk}")
         try:
             product = Product.objects.get(id=pk)
-            data = request.data
-            updated_product = {
+            data = request.data.copy()
+            
+            updated_data = {
                 "name": data.get("name", product.name),
                 "description": data.get("description", product.description),
                 "price": data.get("price", product.price),
                 "stock": data.get("stock", product.stock),
-                "image": data.get("image", product.image),
             }
-            serializer = ProductSerializer(product, data=updated_product, partial=True)
+            
+            if 'category' in data:
+                updated_data['category'] = Category.objects.get(id=data['category']).id
+            
+            # Handle single image (backward compatibility)
+            if 'image' in request.FILES:
+                updated_data['image'] = request.FILES['image']
+            
+            serializer = ProductSerializer(
+                product, 
+                data=updated_data, 
+                partial=True,
+                context={'request': request}
+            )
+            
             if serializer.is_valid():
-                serializer.save()
-                logger.info(f"Product with ID {pk} successfully updated.")
+                product = serializer.save()
+                
+                # Handle multiple images
+                if request.FILES.getlist('images'):
+                    for image_data in request.FILES.getlist('images'):
+                        ProductImage.objects.create(
+                            product=product,
+                            image=image_data
+                        )
+                
                 return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                logger.error(f"Product update failed: {serializer.errors}")
-                return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+                
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProductDeleteView(APIView):
+    authentication_classes = [JWTAuthentication]  # Add this
+    permission_classes = [permissions.IsAdminUser]
+
+    def delete(self, request, pk):
+        try:
+            product = Product.objects.get(id=pk)
+            product.delete()
+            return Response(
+                {"detail": "Product successfully deleted."}, 
+                status=status.HTTP_204_NO_CONTENT
+            )
         except Product.DoesNotExist:
-            logger.error(f"Product with ID {pk} not found.")
             return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
 
 

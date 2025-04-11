@@ -1,16 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteProduct, getProductDetails } from '../actions/productActions';
 import Message from '../components/Message';
 import { Spinner, Row, Col, Container, Card, Button, Modal, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { CREATE_PRODUCT_RESET, DELETE_PRODUCT_RESET, UPDATE_PRODUCT_RESET, CARD_CREATE_RESET } from '../constants';
-import BottomNavBar from '../components/BottomNavBar'; // Import the component
+import BottomNavBar from '../components/BottomNavBar';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import './css/ProductDetailsPage.css'; // Create this CSS file for custom styles
 
 function ProductDetailsPage({ history, match }) {
     const [show, setShow] = useState(false);
     const [quantity, setQuantity] = useState(1);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [autoScroll, setAutoScroll] = useState(true);
     const dispatch = useDispatch();
+    const carouselRef = useRef(null);
 
     const productDetailsReducer = useSelector(state => state.productDetailsReducer);
     const { loading, error, product } = productDetailsReducer;
@@ -21,12 +26,39 @@ function ProductDetailsPage({ history, match }) {
     const deleteProductReducer = useSelector(state => state.deleteProductReducer);
     const { success: productDeletionSuccess } = deleteProductReducer;
 
+    // Combine main image with additional images
+    const allImages = product?.image 
+        ? [product.image, ...(product.images?.map(img => img.image) || [])]
+        : product.images?.map(img => img.image) || [];
+
     // Construct image URL using environment variable
     const getImageUrl = (imagePath) => {
         if (!imagePath) return '';
         if (imagePath.startsWith('http')) return imagePath;
         return `${process.env.REACT_APP_API_BASE_URL}${imagePath}`;
     };
+
+    // Auto-scroll effect
+    useEffect(() => {
+        if (!autoScroll || allImages.length <= 1) return;
+
+        const interval = setInterval(() => {
+            setCurrentImageIndex(prev => (prev + 1) % allImages.length);
+        }, 3000); // Change image every 3 seconds
+
+        return () => clearInterval(interval);
+    }, [autoScroll, allImages.length]);
+
+    // Scroll to current image
+    useEffect(() => {
+        if (carouselRef.current) {
+            const imageWidth = carouselRef.current.children[0]?.offsetWidth || 0;
+            carouselRef.current.scrollTo({
+                left: currentImageIndex * imageWidth,
+                behavior: 'smooth'
+            });
+        }
+    }, [currentImageIndex]);
 
     useEffect(() => {
         dispatch(getProductDetails(match.params.id));
@@ -41,6 +73,21 @@ function ProductDetailsPage({ history, match }) {
     const confirmDelete = () => {
         dispatch(deleteProduct(match.params.id));
         handleClose();
+    };
+
+    const nextImage = () => {
+        setCurrentImageIndex(prev => (prev + 1) % allImages.length);
+        setAutoScroll(false);
+    };
+
+    const prevImage = () => {
+        setCurrentImageIndex(prev => (prev - 1 + allImages.length) % allImages.length);
+        setAutoScroll(false);
+    };
+
+    const goToImage = (index) => {
+        setCurrentImageIndex(index);
+        setAutoScroll(false);
     };
 
     if (productDeletionSuccess) {
@@ -59,7 +106,7 @@ function ProductDetailsPage({ history, match }) {
                         Delete Confirmation
                     </Modal.Title>
                 </Modal.Header>
-                <Modal.Body>Are you sure you want to delete this product <em>"{product.name}"</em>?</Modal.Body>
+                <Modal.Body>Are you sure you want to delete this product <em>"{product?.name}"</em>?</Modal.Body>
                 <Modal.Footer>
                     <Button variant="danger" onClick={confirmDelete}>
                         Confirm Delete
@@ -86,20 +133,67 @@ function ProductDetailsPage({ history, match }) {
                     <Container>
                         <Row>
                             <Col md={6}>
-                                <Card.Img 
-                                    variant="top" 
-                                    src={getImageUrl(product.image)} 
-                                    height="420"
-                                    onError={(e) => {
-                                        e.target.onerror = null;
-                                        e.target.src = ''; // Remove fallback to placeholder image
-                                    }}
-                                />
+                                {/* Image Carousel */}
+                                <div className="image-carousel-container">
+                                    <div 
+                                        className="image-carousel" 
+                                        ref={carouselRef}
+                                        onMouseEnter={() => setAutoScroll(false)}
+                                        onMouseLeave={() => setAutoScroll(true)}
+                                    >
+                                        {allImages.map((img, index) => (
+                                            <div 
+                                                key={index} 
+                                                className={`carousel-image ${index === currentImageIndex ? 'active' : ''}`}
+                                            >
+                                                <img
+                                                    src={getImageUrl(img)}
+                                                    alt={`${product?.name} ${index + 1}`}
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.src = '';
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    
+                                    {/* Navigation Arrows */}
+                                    {allImages.length > 1 && (
+                                        <>
+                                            <button 
+                                                className="carousel-button prev" 
+                                                onClick={prevImage}
+                                            >
+                                                <FaChevronLeft />
+                                            </button>
+                                            <button 
+                                                className="carousel-button next" 
+                                                onClick={nextImage}
+                                            >
+                                                <FaChevronRight />
+                                            </button>
+                                        </>
+                                    )}
+                                    
+                                    {/* Indicators */}
+                                    {allImages.length > 1 && (
+                                        <div className="carousel-indicators">
+                                            {allImages.map((_, index) => (
+                                                <button
+                                                    key={index}
+                                                    className={`indicator ${index === currentImageIndex ? 'active' : ''}`}
+                                                    onClick={() => goToImage(index)}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
 
                                 {userInfo && userInfo.admin && (
-                                    <span style={{ display: "flex" }}>
+                                    <span style={{ display: "flex", marginTop: '15px' }}>
                                         <Button
-                                            className="btn mt-2 btn-danger btn-sm button-focus-css"
+                                            className="btn btn-danger btn-sm button-focus-css"
                                             style={{ width: "100%" }}
                                             onClick={handleShow}
                                         >
@@ -107,8 +201,8 @@ function ProductDetailsPage({ history, match }) {
                                         </Button>
 
                                         <Button
-                                            className="ml-2 mt-2 btn btn-primary btn-sm button-focus-css"
-                                            onClick={() => history.push(`/product-update/${product.id}/`)}
+                                            className="ml-2 btn btn-primary btn-sm button-focus-css"
+                                            onClick={() => history.push(`/product-update/${product?.id}/`)}
                                             style={{ width: "100%" }}
                                         >
                                             Edit Product
@@ -118,13 +212,13 @@ function ProductDetailsPage({ history, match }) {
                             </Col>
 
                             <Col sm>
-                                <b>{product.name}</b>
+                                <b>{product?.name}</b>
                                 <span className="badge badge-secondary ml-2">
-                                    {product.category_name}
+                                    {product?.category_name}
                                 </span>
                                 <hr />
                                 <span className="justify-description-css">
-                                    <p>{product.description}</p>
+                                    <p>{product?.description}</p>
                                 </span>
                                 <span style={{
                                     display: "flex",
@@ -133,13 +227,13 @@ function ProductDetailsPage({ history, match }) {
                                     borderColor: "#C6ACE7",
                                     padding: "2px"
                                 }}>
-                                    Price:<span className="text-success ml-2">Tsh {Math.floor(product.price).toLocaleString()}</span>
+                                    Price:<span className="text-success ml-2">Tsh {Math.floor(product?.price || 0).toLocaleString()}</span>
                                 </span>
                             </Col>
                             <Col sm>
                                 <b>Buy</b>
                                 <hr />
-                                {product.stock ? (
+                                {product?.stock ? (
                                     <>
                                         <Form.Group controlId="quantity">
                                             <Form.Label>Quantity</Form.Label>
@@ -156,7 +250,7 @@ function ProductDetailsPage({ history, match }) {
                                             </Form.Control>
                                         </Form.Group>
                                         <Link 
-                                            to={`/order-now?product=${product.id}&qty=${quantity}&name=${encodeURIComponent(product.name)}&price=${product.price}&supplier=${encodeURIComponent(product.supplier_info?.name || '')}&whatsapp=${encodeURIComponent(product.supplier_info?.whatsapp_link || '')}`} 
+                                            to={`/order-now?product=${product?.id}&qty=${quantity}&name=${encodeURIComponent(product?.name)}&price=${product?.price}&supplier=${encodeURIComponent(product?.supplier_info?.name || '')}&whatsapp=${encodeURIComponent(product?.supplier_info?.whatsapp_link || '')}`} 
                                             className="btn btn-success btn-block"
                                         >
                                             Order Now
@@ -170,7 +264,7 @@ function ProductDetailsPage({ history, match }) {
                     </Container>
                 </div>
             )}
-            <BottomNavBar /> {/* Add the BottomNavBar */}
+            <BottomNavBar />
         </div>
     );
 }

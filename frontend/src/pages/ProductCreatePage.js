@@ -22,6 +22,7 @@ const ProductCreatePage = () => {
     const [category, setCategory] = useState("")
     const [categories, setCategories] = useState([])
     const [loading, setLoading] = useState(false); // State to manage loader visibility
+    const [images, setImages] = useState([]);
 
     // login reducer
     const userLoginReducer = useSelector(state => state.userLoginReducer)
@@ -65,6 +66,16 @@ const ProductCreatePage = () => {
         form_data.append('stock', stock);
         form_data.append('image', image);
         form_data.append('category', category);
+
+        // Handle single image (backward compatibility)
+        if (image) {
+            form_data.append('image', image);
+        }
+
+        // Handle multiple images
+        images.forEach((img) => {
+            form_data.append('images', img);
+        });
 
         console.log("Submitting form data:", Object.fromEntries(form_data.entries())); // Log form data for debugging
 
@@ -179,6 +190,20 @@ const ProductCreatePage = () => {
                         onChange={(e) => setImage(e.target.files[0])}
                     >
                     </Form.Control>
+                </Form.Group>
+
+                <Form.Group controlId='images'>
+                    <Form.Label>
+                        <b>Additional Images</b>
+                    </Form.Label>
+                    <Form.Control
+                        type="file"
+                        multiple
+                        onChange={(e) => setImages([...e.target.files])}
+                    />
+                    <Form.Text className="text-muted">
+                        Select multiple images (optional)
+                    </Form.Text>
                 </Form.Group>
 
                 <Form.Group controlId='category'>
