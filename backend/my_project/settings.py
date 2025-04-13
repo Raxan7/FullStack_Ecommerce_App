@@ -221,6 +221,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "https://luxefreemarket.com",
     "https://api.luxefreemarket.com",
+    "https://www.luxefreemarket.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -251,4 +252,5 @@ CSRF_TRUSTED_ORIGINS = [
     "https://fullstack-ecommerce-app-kcn1.onrender.com",
     "http://localhost:3000",
     "https://luxefreemarket.com",
+    "https://www.luxefreemarket.com",
 ]
