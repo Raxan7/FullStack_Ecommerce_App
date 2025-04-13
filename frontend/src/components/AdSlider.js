@@ -110,7 +110,7 @@ const AdSlider = () => {
             <Card.Body className="text-center py-4">
               {ad.ad_type === 'image' ? (
                 <img 
-                  src={ad.ad_file_url} 
+                  src={`${process.env.REACT_APP_API_BASE_URL}${ad.ad_file_url}`} 
                   alt={ad.ad_title} 
                   className="img-fluid mb-3" 
                   style={{ maxHeight: '200px', objectFit: 'contain' }}
@@ -124,7 +124,7 @@ const AdSlider = () => {
                   )}
                   <video 
                     ref={el => videoRefs.current[index] = el}
-                    src={ad.ad_file_url}
+                    src={`${process.env.REACT_APP_API_BASE_URL}${ad.ad_file_url}`}
                     autoPlay
                     muted
                     playsInline
