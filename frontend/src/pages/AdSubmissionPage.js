@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Form, Button, Row, Col, Container, Spinner, Alert } from 'react-bootstrap'
+import { Form, Button, Row, Col, Container, Spinner, Alert, Modal } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
 import { submitAd } from '../actions/adActions'
 import { AD_SUBMISSION_RESET } from '../constants'
@@ -11,6 +11,7 @@ function AdSubmissionPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [countryCode, setCountryCode] = useState('+255')
   const [adTitle, setAdTitle] = useState('')
   const [adDescription, setAdDescription] = useState('')
   const [adType, setAdType] = useState('image')
@@ -19,6 +20,10 @@ function AdSubmissionPage() {
   const [agreement, setAgreement] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState('lipa_namba')
   
+  const [showModal, setShowModal] = useState(false)
+  const [modalMessage, setModalMessage] = useState('')
+  const [modalVariant, setModalVariant] = useState('success')
+
   const dispatch = useDispatch()
   const history = useHistory()
 
@@ -51,10 +56,24 @@ function AdSubmissionPage() {
       return
     }
 
+    let sanitizedPhone = phone
+    if (sanitizedPhone.startsWith('0')) {
+      sanitizedPhone = sanitizedPhone.slice(1) // Remove the leading '0'
+    }
+
+    if (sanitizedPhone.length !== 9) {
+      setModalMessage('Phone number must have exactly 9 digits (excluding the country code).')
+      setModalVariant('danger')
+      setShowModal(true)
+      return
+    }
+
+    const fullPhoneNumber = `${countryCode}${sanitizedPhone}`
+
     const formData = new FormData()
     formData.append('name', name)
     formData.append('email', email)
-    formData.append('phone_number', phone)
+    formData.append('phone_number', fullPhoneNumber)
     formData.append('ad_title', adTitle)
     formData.append('ad_description', adDescription)
     formData.append('ad_type', adType)
@@ -66,11 +85,18 @@ function AdSubmissionPage() {
     dispatch(submitAd(formData))
   }
 
-  if (success) {
-    dispatch({ type: AD_SUBMISSION_RESET })
-    history.push('/')
-    return null
-  }
+  useEffect(() => {
+    if (success) {
+      setModalMessage('Your ad has been successfully submitted!')
+      setModalVariant('success')
+      setShowModal(true)
+      dispatch({ type: AD_SUBMISSION_RESET })
+    } else if (error) {
+      setModalMessage(`Submission failed: ${error}`)
+      setModalVariant('danger')
+      setShowModal(true)
+    }
+  }, [success, error, dispatch])
 
   if (!userInfo) {
     return (
@@ -115,13 +141,29 @@ function AdSubmissionPage() {
 
               <Form.Group controlId="phone">
                 <Form.Label>Phone Number</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter phone number"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  required
-                />
+                <Row>
+                  <Col xs={4}>
+                    <Form.Control
+                      as="select"
+                      value={countryCode}
+                      onChange={(e) => setCountryCode(e.target.value)}
+                    >
+                      <option value="+255">+255 (Tanzania)</option>
+                      <option value="+254">+254 (Kenya)</option>
+                      <option value="+256">+256 (Uganda)</option>
+                      {/* Add more country codes as needed */}
+                    </Form.Control>
+                  </Col>
+                  <Col xs={8}>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter phone number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      required
+                    />
+                  </Col>
+                </Row>
               </Form.Group>
 
               <Form.Group controlId="adTitle">
@@ -238,6 +280,21 @@ function AdSubmissionPage() {
           </Col>
         </Row>
       </Container>
+
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{modalVariant === 'success' ? 'Success' : 'Error'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Alert variant={modalVariant}>{modalMessage}</Alert>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       <BottomNavBar />
     </>
   )

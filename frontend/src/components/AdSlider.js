@@ -97,100 +97,90 @@ const AdSlider = () => {
       indicators={false} 
       controls={ads.length > 1}
       interval={null} // Disable auto-rotation since we'll handle it manually
-      className="mb-4 shadow-sm"
+      className="mb-4"
+      style={{
+        width: '100%', // Make the width full
+        height: 'auto', // Maintain aspect ratio for responsiveness
+        margin: '0 auto', // Center horizontally
+        display: 'flex', // Enable flexbox
+        alignItems: 'center', // Center vertically
+        justifyContent: 'center', // Center horizontally
+        overflow: 'hidden'
+      }}
     >
       {ads.map((ad, index) => (
         <Carousel.Item key={index}>
           <Card style={{ 
-            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+            position: 'relative',
             border: 'none',
             borderRadius: '10px',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            display: 'inline-block', // Ensure the container adjusts to the content size
+            width: '100%' // Make the card width full
           }}>
-            <Card.Body className="text-center py-4">
-              {ad.ad_type === 'image' ? (
-                <img 
-                  src={`${process.env.REACT_APP_API_BASE_URL}${ad.ad_file_url}`} 
-                  alt={ad.ad_title} 
-                  className="img-fluid mb-3" 
-                  style={{ maxHeight: '200px', objectFit: 'contain' }}
-                />
-              ) : (
-                <div style={{ position: 'relative' }}>
-                  {videoLoading[index] && (
-                    <div className="text-center py-4">
-                      <Spinner animation="border" />
-                    </div>
-                  )}
-                  <video 
-                    ref={el => videoRefs.current[index] = el}
-                    src={`${process.env.REACT_APP_API_BASE_URL}${ad.ad_file_url}`}
-                    autoPlay
-                    muted
-                    playsInline
-                    className="img-fluid mb-3"
+            <Card.Body className="p-0">
+              <a 
+                href={`https://wa.me/${ad.phone_number}?text=I%20saw%20an%20ad%20on%20Luxe%20Free%20Market%20system%20and%20I%20am%20interested%20in%20your%20product%20(${ad.ad_title})`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{ textDecoration: 'none' }}
+              >
+                {ad.ad_type === 'image' ? (
+                  <img 
+                    src={`${process.env.REACT_APP_API_BASE_URL}${ad.ad_file_url}`} 
+                    alt={ad.ad_title} 
+                    className="img-fluid" 
                     style={{ 
-                      maxHeight: '200px', 
-                      objectFit: 'contain',
-                      display: videoLoading[index] ? 'none' : 'block'
+                      width: '100%', // Make the image width full
+                      height: 'auto', // Maintain aspect ratio
+                      maxHeight: '50vh', // Limit the height to 50% of the viewport height in desktop view
+                      objectFit: 'contain', // Ensure the image fits without distortion
+                      display: 'block' 
                     }}
                   />
-                  {autoplayBlocked[index] && (
-                    <div 
-                      style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        zIndex: 1
+                ) : (
+                  <div style={{ position: 'relative' }}>
+                    {videoLoading[index] && (
+                      <div className="text-center py-4">
+                        <Spinner animation="border" />
+                      </div>
+                    )}
+                    <video 
+                      ref={el => videoRefs.current[index] = el}
+                      src={`${process.env.REACT_APP_API_BASE_URL}${ad.ad_file_url}`}
+                      autoPlay
+                      muted
+                      playsInline
+                      className="img-fluid"
+                      style={{ 
+                        width: '100%', // Make the video width full
+                        height: 'auto', // Maintain aspect ratio
+                        display: videoLoading[index] ? 'none' : 'block'
                       }}
-                    >
-                      <Button 
-                        variant="primary" 
-                        onClick={() => handlePlayClick(index)}
-                        style={{
-                          padding: '0.5rem 1.5rem',
-                          borderRadius: '50px',
-                          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
-                        }}
-                      >
-                        Play Video
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              )}
-              <h3 style={{ color: '#2c3e50', fontWeight: 'bold', marginBottom: '1rem' }}>
-                {ad.ad_title}
-              </h3>
-              <p className="lead mb-4" style={{ color: '#34495e', fontSize: '1.25rem' }}>
-                {ad.ad_description}
-              </p>
-              <div className="d-flex justify-content-center">
-                <Link to="/advertise" className="btn btn-primary btn-lg"
-                  style={{
-                    padding: '0.75rem 2rem',
-                    fontSize: '1.1rem',
-                    fontWeight: '600',
-                    borderRadius: '50px',
-                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.3s ease',
-                    backgroundColor: 'black',
-                    borderColor: 'black'
-                  }}
-                  onMouseOver={(e) => {
-                    e.target.style.transform = 'translateY(-2px)';
-                    e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
-                  }}
-                  onMouseOut={(e) => {
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
-                  }}>
-                  Advertise With Us →
-                </Link>
-              </div>
-              <div className="mt-3 text-muted">
-                <small>Sponsored Ad</small>
+                    />
+                  </div>
+                )}
+              </a>
+              <div 
+                style={{
+                  position: 'absolute',
+                  bottom: 0, // Move to the bottom
+                  left: 0,
+                  width: '100%',
+                  background: 'rgba(0, 0, 0, 0.5)',
+                  color: 'white',
+                  padding: '0.5rem',
+                  textAlign: 'center',
+                  boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.3)', // Shadow only around the title and description
+                  zIndex: 2
+                }}
+              >
+                <h3 style={{ fontWeight: 'bold', marginBottom: '0.25rem', textShadow: '0 2px 5px rgba(0, 0, 0, 0.7)' }}>
+                  {ad.ad_title}
+                </h3>
+                <p style={{ fontSize: '1rem', textShadow: '0 2px 5px rgba(0, 0, 0, 0.7)' }}>
+                  {ad.ad_description}
+                </p>
               </div>
             </Card.Body>
           </Card>
