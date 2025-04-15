@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { Form, Button, Row, Col } from 'react-bootstrap'
 import { login } from '../actions/userActions'
 import Message from '../components/Message';
-
+import logo from '../assets/logo.jpeg'; // Adjusted the path
 
 function LoginPage({ history }) {
     const [username, setUsername] = useState("")
@@ -30,8 +30,11 @@ function LoginPage({ history }) {
     return (
         <div>
             <Row className='justify-content-md-center'>
-                <Col xs={12} md={6}>                    
-                    <h1>Sign In</h1>                    
+                <Col xs={12} md={6}>
+                    <div className="text-center">
+                        <img src={logo} alt="Logo" style={{ width: '150px', marginBottom: '20px' }} />
+                    </div>
+                    <h1>Sign In</h1>
                     {error && <Message variant='danger'>{error}</Message>}
                     <Form onSubmit={submitHandler}>
                         <Form.Group controlId='username'>

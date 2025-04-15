@@ -96,7 +96,7 @@ const AdSlider = () => {
       onSelect={(selectedIndex) => setActiveIndex(selectedIndex)}
       indicators={false} 
       controls={ads.length > 1}
-      interval={null} // Disable auto-rotation since we'll handle it manually
+      interval={10000} // Set interval to 10 seconds
       className="mb-4"
       style={{
         width: '100%', // Make the width full
