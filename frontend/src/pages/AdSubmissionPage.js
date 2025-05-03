@@ -4,8 +4,8 @@ import { Form, Button, Row, Col, Container, Spinner, Alert, Modal } from 'react-
 import { useHistory } from 'react-router-dom'
 import { submitAd } from '../actions/adActions'
 import { AD_SUBMISSION_RESET } from '../constants'
-import paymentInstructions from '../assets/lipa_namba.jpeg';
-import BottomNavBar from '../components/BottomNavBar';
+import paymentInstructions from '../assets/lipa_namba.jpeg'
+import BottomNavBar from '../components/BottomNavBar'
 
 function AdSubmissionPage() {
   const [name, setName] = useState('')
@@ -27,20 +27,50 @@ function AdSubmissionPage() {
   const dispatch = useDispatch()
   const history = useHistory()
 
-  // Match the same pattern as NavBar for authentication
-  const { userInfo } = useSelector(state => state.userLoginReducer)
+  // Get state from Redux store with proper fallbacks
+  const { userInfo } = useSelector(state => state.userLoginReducer) || {}
   const { 
-    loading = false, 
-    error = null, 
-    success = false 
-  } = useSelector(state => state.adSubmissionReducer || {})
+    loading: adLoading = false, 
+    error: adError = null, 
+    success: adSuccess = false 
+  } = useSelector(state => state.adSubmission || {})
+
+  // Debug state changes
+  useEffect(() => {
+    console.log('Redux State:', { adLoading, adError, adSuccess })
+  }, [adLoading, adError, adSuccess])
 
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!userInfo) {
-      history.push('/login')
+      history.push('/login?redirect=submit-ad')
     }
   }, [userInfo, history])
+
+  // Handle success state
+  useEffect(() => {
+    if (adSuccess) {
+      setModalMessage('Your ad has been successfully submitted! Redirecting to home page...')
+      setModalVariant('success')
+      setShowModal(true)
+      
+      const timer = setTimeout(() => {
+        dispatch({ type: AD_SUBMISSION_RESET })
+        history.push('/')
+      }, 3000)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [adSuccess, history, dispatch])
+
+  // Handle error state
+  useEffect(() => {
+    if (adError) {
+      setModalMessage(adError)
+      setModalVariant('danger')
+      setShowModal(true)
+    }
+  }, [adError])
 
   // Cleanup on unmount
   useEffect(() => {
@@ -49,19 +79,23 @@ function AdSubmissionPage() {
     }
   }, [dispatch])
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault()
     
     if (!userInfo) {
+      setModalMessage('Please login to submit an ad')
+      setModalVariant('danger')
+      setShowModal(true)
       return
     }
 
+    // Validate phone number
     let sanitizedPhone = phone
     if (sanitizedPhone.startsWith('0')) {
-      sanitizedPhone = sanitizedPhone.slice(1) // Remove the leading '0'
+      sanitizedPhone = sanitizedPhone.slice(1)
     }
 
-    if (sanitizedPhone.length !== 9) {
+    if (sanitizedPhone.length !== 9 || !/^\d+$/.test(sanitizedPhone)) {
       setModalMessage('Phone number must have exactly 9 digits (excluding the country code).')
       setModalVariant('danger')
       setShowModal(true)
@@ -82,21 +116,12 @@ function AdSubmissionPage() {
     formData.append('ad_file', adFile)
     formData.append('payment_proof', paymentProof)
 
-    dispatch(submitAd(formData))
-  }
-
-  useEffect(() => {
-    if (success) {
-      setModalMessage('Your ad has been successfully submitted!')
-      setModalVariant('success')
-      setShowModal(true)
-      dispatch({ type: AD_SUBMISSION_RESET })
-    } else if (error) {
-      setModalMessage(`Submission failed: ${error}`)
-      setModalVariant('danger')
-      setShowModal(true)
+    try {
+      await dispatch(submitAd(formData))
+    } catch (err) {
+      console.error('Submission error:', err)
     }
-  }, [success, error, dispatch])
+  }
 
   if (!userInfo) {
     return (
@@ -114,7 +139,18 @@ function AdSubmissionPage() {
         <Row className="justify-content-md-center">
           <Col xs={12} md={8}>
             <h2 className="my-4">Submit Your Ad</h2>
-            {error && <Alert variant="danger">{error}</Alert>}
+            
+            {adSuccess && (
+              <Alert variant="success">
+                Your ad has been successfully submitted! Redirecting to home page...
+              </Alert>
+            )}
+            
+            {adError && (
+              <Alert variant="danger">
+                {adError}
+              </Alert>
+            )}
             
             <Form onSubmit={submitHandler}>
               <Form.Group controlId="name">
@@ -151,7 +187,6 @@ function AdSubmissionPage() {
                       <option value="+255">+255 (Tanzania)</option>
                       <option value="+254">+254 (Kenya)</option>
                       <option value="+256">+256 (Uganda)</option>
-                      {/* Add more country codes as needed */}
                     </Form.Control>
                   </Col>
                   <Col xs={8}>
@@ -203,6 +238,7 @@ function AdSubmissionPage() {
 
               <Form.Group controlId="adFile">
                 <Form.Label>Upload Ad File</Form.Label>
+                <small className="text-muted">Advertisement should not Exceed More than 10 seconds and 15 MB</small>
                 <Form.File
                   onChange={(e) => setAdFile(e.target.files[0])}
                   accept={adType === 'image' ? 'image/*' : 'video/*'}
@@ -260,10 +296,10 @@ function AdSubmissionPage() {
               <Button 
                 variant="primary" 
                 type="submit" 
-                disabled={loading || !agreement}
+                disabled={adLoading || !agreement}
                 className="mb-5"
               >
-                {loading ? (
+                {adLoading ? (
                   <>
                     <Spinner
                       as="span"
@@ -282,17 +318,25 @@ function AdSubmissionPage() {
       </Container>
 
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-        <Modal.Header closeButton>
+        <Modal.Header closeButton={modalVariant !== 'success'}>
           <Modal.Title>{modalVariant === 'success' ? 'Success' : 'Error'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Alert variant={modalVariant}>{modalMessage}</Alert>
+          {modalVariant === 'success' && (
+            <div className="text-center mt-2">
+              <Spinner animation="border" size="sm" />
+              <p>Redirecting to home page...</p>
+            </div>
+          )}
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
+        {modalVariant !== 'success' && (
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>
+              Close
+            </Button>
+          </Modal.Footer>
+        )}
       </Modal>
 
       <BottomNavBar />
