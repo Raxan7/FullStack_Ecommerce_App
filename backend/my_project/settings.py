@@ -254,3 +254,9 @@ CSRF_TRUSTED_ORIGINS = [
     "https://luxefreemarket.com",
     "https://www.luxefreemarket.com",
 ]
+
+# 15 MB in bytes
+MAX_UPLOAD_SIZE = 15728640  # 15 * 1024 * 1024
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = MAX_UPLOAD_SIZE
+FILE_UPLOAD_MAX_MEMORY_SIZE = MAX_UPLOAD_SIZE
