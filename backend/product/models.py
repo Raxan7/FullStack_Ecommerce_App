@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
 
@@ -34,6 +35,7 @@ class Supplier(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=200, blank=False, null=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='products')
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=8, decimal_places=2)
     stock = models.BooleanField(default=False)
