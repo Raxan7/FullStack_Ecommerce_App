@@ -22,10 +22,12 @@ class ProductSerializer(serializers.ModelSerializer):
     supplier_info = serializers.SerializerMethodField()
     category_name = serializers.CharField(source='category.name', read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)  # Add this line
+    user = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
     
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'image', 'images', 'supplier_info', 'stock', 'category', 'category_name', 'supplier']
+        fields = ['id', 'name', 'description', 'price', 'image', 'images', 'supplier_info', 'stock', 
+                  'category', 'category_name', 'supplier', 'user']
         extra_kwargs = {
             'name': {'required': True},
             'price': {'required': True},
@@ -41,6 +43,7 @@ class ProductSerializer(serializers.ModelSerializer):
         return None
     
     def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             supplier, created = Supplier.objects.get_or_create(
