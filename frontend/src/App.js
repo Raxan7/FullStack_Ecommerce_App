@@ -29,6 +29,8 @@ import AboutPage from './pages/AboutPage'
 import OrderNowPage from './pages/OrderNowPage'
 import SearchPage from './pages/SearchPage';
 
+import UpdateWhatsAppNumber from './components/UpdateWhatsAppNumber';
+
 
 const App = () => {
 
@@ -64,6 +66,8 @@ const App = () => {
             <Route path="/order-now" component={OrderNowPage} exact />
 
             <Route path="/search" component={SearchPage} exact />
+
+            <Route path="/update-whatsapp" component={UpdateWhatsAppNumber} exact />
 
             <Route path="" component={NotFound} exact />
           </Switch>
