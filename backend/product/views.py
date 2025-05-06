@@ -1,5 +1,5 @@
 import logging
-from .models import Product, Category, Supplier  # Ensure Supplier is imported
+from .models import Product, Category, ProductImage, Supplier  # Ensure Supplier is imported
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
