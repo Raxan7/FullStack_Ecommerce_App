@@ -1,22 +1,22 @@
 {
   "files": {
     "main.css": "/static/css/main.8a557490.chunk.css",
-    "main.js": "/static/js/main.bb8161c0.chunk.js",
-    "main.js.map": "/static/js/main.bb8161c0.chunk.js.map",
+    "main.js": "/static/js/main.bd353993.chunk.js",
+    "main.js.map": "/static/js/main.bd353993.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.cc85cbe0.js",
     "runtime-main.js.map": "/static/js/runtime-main.cc85cbe0.js.map",
-    "static/js/2.4bb3aa76.chunk.js": "/static/js/2.4bb3aa76.chunk.js",
-    "static/js/2.4bb3aa76.chunk.js.map": "/static/js/2.4bb3aa76.chunk.js.map",
+    "static/js/2.3b460076.chunk.js": "/static/js/2.3b460076.chunk.js",
+    "static/js/2.3b460076.chunk.js.map": "/static/js/2.3b460076.chunk.js.map",
     "index.html": "/index.html",
     "static/css/main.8a557490.chunk.css.map": "/static/css/main.8a557490.chunk.css.map",
-    "static/js/2.4bb3aa76.chunk.js.LICENSE.txt": "/static/js/2.4bb3aa76.chunk.js.LICENSE.txt",
+    "static/js/2.3b460076.chunk.js.LICENSE.txt": "/static/js/2.3b460076.chunk.js.LICENSE.txt",
     "static/media/lipa_namba.878e5a37.jpeg": "/static/media/lipa_namba.878e5a37.jpeg",
     "static/media/logo.b76b78ec.jpeg": "/static/media/logo.b76b78ec.jpeg"
   },
   "entrypoints": [
     "static/js/runtime-main.cc85cbe0.js",
-    "static/js/2.4bb3aa76.chunk.js",
+    "static/js/2.3b460076.chunk.js",
     "static/css/main.8a557490.chunk.css",
-    "static/js/main.bb8161c0.chunk.js"
+    "static/js/main.bd353993.chunk.js"
   ]
 }
