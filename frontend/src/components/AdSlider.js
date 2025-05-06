@@ -10,6 +10,7 @@ const AdSlider = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [videoLoading, setVideoLoading] = useState({});
   const [autoplayBlocked, setAutoplayBlocked] = useState({});
+  const [videoMuted, setVideoMuted] = useState({}); // ✅ NEW: Track mute state
   const carouselRef = useRef(null);
   const videoRefs = useRef([]);
 
@@ -18,19 +19,22 @@ const AdSlider = () => {
       try {
         const { data } = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/ads/active/`);
         setAds(data);
-        
-        // Initialize loading and autoplay states for each video ad
+
         const initialLoadingStates = {};
         const initialAutoplayStates = {};
+        const initialMuteStates = {};
+
         data.forEach((ad, index) => {
           if (ad.ad_type === 'video') {
             initialLoadingStates[index] = true;
             initialAutoplayStates[index] = false;
+            initialMuteStates[index] = true; // Start muted
           }
         });
-        
+
         setVideoLoading(initialLoadingStates);
         setAutoplayBlocked(initialAutoplayStates);
+        setVideoMuted(initialMuteStates); // ✅ Set initial mute state
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -40,15 +44,12 @@ const AdSlider = () => {
     fetchAds();
   }, []);
 
-  // Handle video ended event
   const handleVideoEnd = (index) => {
-    // Only auto-advance if there are more ads
     if (index < ads.length - 1) {
       carouselRef.current.next();
     }
   };
 
-  // Handle video play/pause events for autoplay detection
   const handleVideoPlay = (index) => {
     setAutoplayBlocked(prev => ({ ...prev, [index]: false }));
   };
@@ -59,30 +60,75 @@ const AdSlider = () => {
     }
   };
 
-  // Set up video event listeners when ads load
   useEffect(() => {
     if (ads.length > 0) {
       videoRefs.current = videoRefs.current.slice(0, ads.length);
-      
+
       ads.forEach((ad, index) => {
         if (ad.ad_type === 'video' && videoRefs.current[index]) {
           const video = videoRefs.current[index];
+
           video.onended = () => handleVideoEnd(index);
           video.onplay = () => handleVideoPlay(index);
           video.onpause = (e) => handleVideoPause(index, e);
-          video.onloadeddata = () => {
+          video.oncanplay = () => {
             setVideoLoading(prev => ({ ...prev, [index]: false }));
           };
+          video.onerror = () => {
+            console.error(`Failed to load video at index ${index}: ${ad.ad_file_url}`);
+            setVideoLoading(prev => ({ ...prev, [index]: false }));
+          };
+
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {
+              setAutoplayBlocked(prev => ({ ...prev, [index]: true }));
+              setVideoLoading(prev => ({ ...prev, [index]: false }));
+            });
+          }
         }
       });
+
+      updateVideoPlayback(0);
     }
   }, [ads]);
 
-  // Manual play function for when autoplay is blocked
   const handlePlayClick = (index) => {
-    if (videoRefs.current[index]) {
-      videoRefs.current[index].play();
+    const video = videoRefs.current[index];
+    if (video) {
+      video.muted = false;
+      video.play();
+      setVideoMuted(prev => ({ ...prev, [index]: false }));
     }
+  };
+
+  const toggleMute = (index) => {
+    const video = videoRefs.current[index];
+    if (video) {
+      const newMuteState = !videoMuted[index];
+      video.muted = newMuteState;
+      setVideoMuted(prev => ({ ...prev, [index]: newMuteState }));
+    }
+  };
+
+  const updateVideoPlayback = (selectedIndex) => {
+    videoRefs.current.forEach((video, index) => {
+      if (video) {
+        const isMuted = videoMuted[index] ?? true;
+        if (index === selectedIndex) {
+          video.muted = isMuted;
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {
+              setAutoplayBlocked(prev => ({ ...prev, [index]: true }));
+            });
+          }
+        } else {
+          video.pause();
+          video.muted = true;
+        }
+      }
+    });
   };
 
   if (loading) return <div className="text-center py-4"><Spinner animation="border" /></div>;
@@ -90,90 +136,109 @@ const AdSlider = () => {
   if (ads.length === 0) return null;
 
   return (
-    <Carousel 
+    <Carousel
       ref={carouselRef}
       activeIndex={activeIndex}
-      onSelect={(selectedIndex) => setActiveIndex(selectedIndex)}
-      indicators={false} 
+      onSelect={(selectedIndex) => {
+        setActiveIndex(selectedIndex);
+        updateVideoPlayback(selectedIndex);
+      }}
+      indicators={false}
       controls={ads.length > 1}
-      interval={10000} // Set interval to 10 seconds
+      interval={10000}
       className="mb-4"
       style={{
-        width: '100%', // Make the width full
-        height: 'auto', // Maintain aspect ratio for responsiveness
-        margin: '0 auto', // Center horizontally
-        display: 'flex', // Enable flexbox
-        alignItems: 'center', // Center vertically
-        justifyContent: 'center', // Center horizontally
+        width: '100%',
+        height: 'auto',
+        margin: '0 auto',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         overflow: 'hidden'
       }}
     >
       {ads.map((ad, index) => (
         <Carousel.Item key={index}>
-          <Card style={{ 
+          <Card style={{
             position: 'relative',
             border: 'none',
             borderRadius: '10px',
             overflow: 'hidden',
-            display: 'inline-block', // Ensure the container adjusts to the content size
-            width: '100%' // Make the card width full
+            display: 'inline-block',
+            width: '100%'
           }}>
             <Card.Body className="p-0">
-              <a 
-                href={`https://wa.me/${ad.phone_number}?text=I%20saw%20an%20ad%20on%20Luxe%20Free%20Market%20system%20and%20I%20am%20interested%20in%20your%20product%20(${ad.ad_title})`} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                style={{ textDecoration: 'none' }}
-              >
-                {ad.ad_type === 'image' ? (
-                  <img 
-                    src={`${process.env.REACT_APP_API_BASE_URL}${ad.ad_file_url}`} 
-                    alt={ad.ad_title} 
-                    className="img-fluid" 
-                    style={{ 
-                      width: '100%', // Make the image width full
-                      height: 'auto', // Maintain aspect ratio
-                      maxHeight: '50vh', // Limit the height to 50% of the viewport height in desktop view
-                      objectFit: 'contain', // Ensure the image fits without distortion
-                      display: 'block' 
+              {ad.ad_type === 'image' ? (
+                <img
+                  src={`${process.env.REACT_APP_API_BASE_URL}${ad.ad_file_url}`}
+                  alt={ad.ad_title}
+                  className="img-fluid"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: '50vh',
+                    objectFit: 'contain',
+                    display: 'block'
+                  }}
+                />
+              ) : (
+                <div style={{ position: 'relative' }}>
+                  <video
+                    ref={el => videoRefs.current[index] = el}
+                    src={`${process.env.REACT_APP_API_BASE_URL}${ad.ad_file_url}`}
+                    playsInline
+                    preload="auto"
+                    className="img-fluid"
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      maxHeight: '50vh',
+                      objectFit: 'contain',
+                      display: 'block',
                     }}
+                    onClick={() => handlePlayClick(index)}
+                    muted={videoMuted[index] ?? true}
                   />
-                ) : (
-                  <div style={{ position: 'relative' }}>
-                    {videoLoading[index] && (
-                      <div className="text-center py-4">
-                        <Spinner animation="border" />
-                      </div>
-                    )}
-                    <video 
-                      ref={el => videoRefs.current[index] = el}
-                      src={`${process.env.REACT_APP_API_BASE_URL}${ad.ad_file_url}`}
-                      autoPlay
-                      muted
-                      playsInline
-                      className="img-fluid"
-                      style={{ 
-                        width: '100%', // Make the video width full
-                        height: 'auto', // Maintain aspect ratio
-                        display: videoLoading[index] ? 'none' : 'block'
-                      }}
-                    />
-                  </div>
-                )}
-              </a>
-              <div 
+                  
+                  {/* ✅ Mute/Unmute Button */}
+                  <Button
+                    variant="light"
+                    size="sm"
+                    style={{
+                      position: 'absolute',
+                      top: 10,
+                      right: 10,
+                      zIndex: 10,
+                      opacity: 0.9
+                    }}
+                    onClick={() => toggleMute(index)}
+                  >
+                    {videoMuted[index] ? 'Unmute' : 'Mute'}
+                  </Button>
+                </div>
+              )}
+
+              {/* WhatsApp Shadow Section */}
+              <div
                 style={{
                   position: 'absolute',
-                  bottom: 0, // Move to the bottom
+                  bottom: 0,
                   left: 0,
                   width: '100%',
                   background: 'rgba(0, 0, 0, 0.5)',
                   color: 'white',
                   padding: '0.5rem',
                   textAlign: 'center',
-                  boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.3)', // Shadow only around the title and description
-                  zIndex: 2
+                  boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.3)',
+                  zIndex: 2,
+                  cursor: 'pointer'
                 }}
+                onClick={() =>
+                  window.open(
+                    `https://wa.me/${ad.phone_number}?text=I%20saw%20an%20ad%20on%20Luxe%20Free%20Market%20system%20and%20I%20am%20interested%20in%20your%20product%20(${ad.ad_title})`,
+                    '_blank'
+                  )
+                }
               >
                 <h3 style={{ fontWeight: 'bold', marginBottom: '0.25rem', textShadow: '0 2px 5px rgba(0, 0, 0, 0.7)' }}>
                   {ad.ad_title}
