@@ -7,6 +7,7 @@ from rest_framework import permissions
 from .serializers import ProductSerializer, CategorySerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.parsers import MultiPartParser, FormParser
+from .permissions import IsOwnerOrReadOnly
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +41,7 @@ class ProductDetailView(APIView):
 
 # product/views.py
 class ProductCreateView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]  # Changed from IsAdminUser
     authentication_classes = [JWTAuthentication]
     parser_classes = (MultiPartParser, FormParser)
 
@@ -78,7 +79,7 @@ class ProductCreateView(APIView):
 
 class ProductEditView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]  # Added IsOwnerOrReadOnly
     parser_classes = (MultiPartParser, FormParser)
 
     def put(self, request, pk):
@@ -128,7 +129,7 @@ class ProductEditView(APIView):
 
 class ProductDeleteView(APIView):
     authentication_classes = [JWTAuthentication]  # Add this
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]  # Added IsOwnerOrReadOnly
 
     def delete(self, request, pk):
         try:
