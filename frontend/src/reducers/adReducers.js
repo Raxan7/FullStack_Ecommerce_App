@@ -22,13 +22,34 @@ export const adSubmissionReducer = (state = {
 }, action) => {
     switch (action.type) {
         case AD_SUBMISSION_REQUEST:
-            return { ...state, loading: true, error: null }
+            return { 
+                ...state, 
+                loading: true, 
+                error: null, 
+                success: false 
+            }
         case AD_SUBMISSION_SUCCESS:
-            return { ...state, loading: false, success: true, ad: action.payload }
+            return { 
+                ...state, 
+                loading: false, 
+                success: true, 
+                error: null, 
+                ad: action.payload 
+            }
         case AD_SUBMISSION_FAIL:
-            return { ...state, loading: false, error: action.payload }
+            return { 
+                ...state, 
+                loading: false, 
+                success: false, 
+                error: action.payload 
+            }
         case AD_SUBMISSION_RESET:
-            return { loading: false, error: null, success: false, ad: null }
+            return { 
+                loading: false, 
+                error: null, 
+                success: false, 
+                ad: null 
+            }
         default:
             return state
     }

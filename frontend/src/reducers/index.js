@@ -66,8 +66,7 @@ const allReducers = combineReducers({
     userDetailsUpdateReducer,
     deleteUserAccountReducer,
     
-    // Add the new ad reducers
-    adSubmission: adSubmissionReducer, // Changed from adSubmissionReducer
+    adSubmission: adSubmissionReducer,
     adApproval: adApprovalReducer,
     activeAds: activeAdsListReducer,
     pendingAds: pendingAdsListReducer,
