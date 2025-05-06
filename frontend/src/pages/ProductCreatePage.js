@@ -8,6 +8,7 @@ import { CREATE_PRODUCT_RESET } from '../constants'
 import Message from '../components/Message';
 import Loader from '../components/Loader'; // Import a loader component
 import BottomNavBar from '../components/BottomNavBar'; // Import the component
+import axios from 'axios';
 
 const ProductCreatePage = () => {
 
@@ -23,6 +24,7 @@ const ProductCreatePage = () => {
     const [categories, setCategories] = useState([])
     const [loading, setLoading] = useState(false); // State to manage loader visibility
     const [images, setImages] = useState([]);
+    const [checkingWhatsApp, setCheckingWhatsApp] = useState(true);
 
     // login reducer
     const userLoginReducer = useSelector(state => state.userLoginReducer)
@@ -35,6 +37,41 @@ const ProductCreatePage = () => {
     // check token validation reducer
     const checkTokenValidationReducer = useSelector(state => state.checkTokenValidationReducer)
     const { error: tokenError } = checkTokenValidationReducer
+
+    useEffect(() => {
+        if (!userInfo) {
+            history.push("/login");
+            return;
+        }
+
+        const checkWhatsAppNumber = async () => {
+            try {
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${userInfo.token || userInfo.access}`,
+                    },
+                    withCredentials: true,
+                };
+
+                const { data } = await axios.get(
+                    `${process.env.REACT_APP_API_BASE_URL}/api/check-whatsapp/`,
+                    config
+                );
+
+                if (data.whatsapp_number === "N/A") {
+                    history.push("/update-whatsapp");
+                } else {
+                    setCheckingWhatsApp(false);
+                }
+            } catch (error) {
+                console.error("Error checking WhatsApp number:", error);
+                setCheckingWhatsApp(false);
+            }
+        };
+
+        checkWhatsAppNumber();
+    }, [dispatch, userInfo, history]);
 
     useEffect(() => {
         if (!userInfo) {
@@ -95,6 +132,10 @@ const ProductCreatePage = () => {
         dispatch(logout());
         history.push("/login");
         window.location.reload();
+    }
+
+    if (checkingWhatsApp) {
+        return <Loader />;
     }
 
     return (
