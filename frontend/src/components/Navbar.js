@@ -78,35 +78,30 @@ function NavBar() {
                         <Navbar.Toggle aria-controls="basic-navbar-nav" />
                         <Navbar.Collapse id="basic-navbar-nav">
                             <Nav className="mr-auto">
-
                                 <LinkContainer to="/help">
-                                <Nav.Link>Help</Nav.Link>
+                                    <Nav.Link>Help</Nav.Link>
                                 </LinkContainer>
                                 <LinkContainer to="/about">
-                                <Nav.Link>About Us</Nav.Link>
+                                    <Nav.Link>About Us</Nav.Link>
                                 </LinkContainer>
 
-                                {/* New Product (Admins Only) */}
-
-                                {userInfo && userInfo.admin ?
+                                {/* New Product (Available to all authenticated users) */}
+                                {userInfo && (
                                     <LinkContainer to="/new-product/">
-                                        <Nav.Link >Add Product</Nav.Link>
+                                        <Nav.Link>Add Product</Nav.Link>
                                     </LinkContainer>
-                                    : ""
-                                }
+                                )}
 
                                 {/* Admin-only links (if user is admin) */}
-                                {/* {userInfo && userInfo.isAdmin && (
+                                {userInfo && userInfo.admin && (
                                     <LinkContainer to="/ad-approval">
                                         <Nav.Link>Approve Ads</Nav.Link>
                                     </LinkContainer>
-                                )} */}
-
+                                )}
                             </Nav>
 
                             {/* login-logout condition here */}
-
-                            {userInfo ?
+                            {userInfo ? (
                                 <div>
                                     <NavDropdown className="navbar-nav text-capitalize" title={userInfo.username} id='username'>
                                         <LinkContainer to="/account">
@@ -126,12 +121,11 @@ function NavBar() {
                                         </NavDropdown.Item>
                                     </NavDropdown>
                                 </div>
-                                :
-
+                            ) : (
                                 <LinkContainer to="/login">
                                     <Nav.Link><i className="fas fa-user"></i> Login</Nav.Link>
                                 </LinkContainer>
-                            }
+                            )}
                         </Navbar.Collapse>
                     </Container>
                 </Navbar>
