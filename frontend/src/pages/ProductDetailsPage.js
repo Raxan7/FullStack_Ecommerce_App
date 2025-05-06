@@ -190,7 +190,7 @@ function ProductDetailsPage({ history, match }) {
                                     )}
                                 </div>
 
-                                {userInfo && userInfo.admin && (
+                                {userInfo && userInfo.id === product?.user && (
                                     <span style={{ display: "flex", marginTop: '15px' }}>
                                         <Button
                                             className="btn btn-danger btn-sm button-focus-css"
