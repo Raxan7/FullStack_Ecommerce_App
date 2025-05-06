@@ -151,3 +151,58 @@ class CategoryListView(APIView):
         serializer = CategorySerializer(categories, many=True)
         logger.info(f"Number of categories fetched: {categories.count()}")
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+# product/views.py
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from .models import Supplier
+
+class UpdateWhatsAppNumberView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        whatsapp_number = request.data.get('whatsapp_number')
+        
+        if not whatsapp_number or not whatsapp_number.startswith('+255') or len(whatsapp_number) != 13:
+            return Response(
+                {"detail": "Please provide a valid Tanzanian WhatsApp number starting with +255"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            supplier = Supplier.objects.get(name=request.user.username)
+            supplier.whatsapp_number = whatsapp_number
+            supplier.save()
+            return Response(
+                {"detail": "WhatsApp number updated successfully"},
+                status=status.HTTP_200_OK
+            )
+        except Supplier.DoesNotExist:
+            return Response(
+                {"detail": "Supplier not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+
+# product/views.py
+class CheckWhatsAppNumberView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            supplier = Supplier.objects.get(name=request.user.username)
+            return Response(
+                {"whatsapp_number": supplier.whatsapp_number},
+                status=status.HTTP_200_OK
+            )
+        except Supplier.DoesNotExist:
+            return Response(
+                {"detail": "Supplier not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
