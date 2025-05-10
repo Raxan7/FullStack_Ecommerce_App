@@ -37,7 +37,7 @@ class Product(models.Model):
     name = models.CharField(max_length=200, blank=False, null=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='products')
     description = models.TextField(blank=True)
-    price = models.DecimalField(max_digits=8, decimal_places=2)
+    price = models.DecimalField(max_digits=12, decimal_places=2)
     stock = models.BooleanField(default=False)
     image = models.ImageField(null=True, blank=True)
     category = models.ForeignKey(
