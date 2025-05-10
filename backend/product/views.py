@@ -18,9 +18,9 @@ class ProductView(APIView):
         category = request.query_params.get('category', None)
         logger.info(f"Fetching products. Category filter: {category}")
         if category and category != 'All':
-            products = Product.objects.filter(category__name=category)
+            products = Product.objects.filter(category__name=category).order_by('-id')
         else:
-            products = Product.objects.all()
+            products = Product.objects.all().order_by('-id')
         logger.info(f"Number of products fetched: {products.count()}")
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
