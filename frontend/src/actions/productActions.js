@@ -100,6 +100,8 @@ export const createProduct = (product) => async (dispatch, getState) => {
             payload: data
         })
 
+        return data; // Return data for promise handling
+
     } catch (error) {
         console.error("Error creating product:", error.response ? error.response.data : error.message)
         dispatch({
@@ -108,6 +110,9 @@ export const createProduct = (product) => async (dispatch, getState) => {
                 ? error.response.data
                 : { detail: error.message },
         })
+        
+        // Re-throw the error for proper promise rejection
+        throw error;
     }
 }
 

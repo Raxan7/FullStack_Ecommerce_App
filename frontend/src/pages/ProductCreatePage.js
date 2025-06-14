@@ -66,20 +66,18 @@ const ProductCreatePage = () => {
                 }
             } catch (error) {
                 console.error("Error checking WhatsApp number:", error);
-                setCheckingWhatsApp(false);
+                // If there's an error, check if it's a token issue
+                if (error.response && error.response.status === 401) {
+                    alert("Session expired, please login again.");
+                    dispatch(logout());
+                    history.push("/login");
+                    window.location.reload();
+                } else {
+                    setCheckingWhatsApp(false);
+                }
             }
         };
 
-        checkWhatsAppNumber();
-    }, [dispatch, userInfo, history]);
-
-    useEffect(() => {
-        if (!userInfo) {
-            history.push("/login")
-        }
-        dispatch(checkTokenValidation())
-
-        // Fetch categories from the backend
         const fetchCategories = async () => {
             try {
                 const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/categories/`)
@@ -88,11 +86,15 @@ const ProductCreatePage = () => {
             } catch (error) {
                 console.error("Failed to fetch categories:", error)
             }
-        }
-        fetchCategories()
+        };
+
+        // Run both checks
+        checkWhatsAppNumber();
+        fetchCategories();
+        
     }, [dispatch, userInfo, history])
 
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
@@ -101,7 +103,6 @@ const ProductCreatePage = () => {
         form_data.append('description', description);
         form_data.append('price', price);
         form_data.append('stock', stock);
-        form_data.append('image', image);
         form_data.append('category', category);
 
         // Handle single image (backward compatibility)
@@ -116,16 +117,42 @@ const ProductCreatePage = () => {
 
         console.log("Submitting form data:", Object.fromEntries(form_data.entries())); // Log form data for debugging
 
-        dispatch(createProduct(form_data)).finally(() => setLoading(false));
+        try {
+            await dispatch(createProduct(form_data));
+            setLoading(false);
+        } catch (error) {
+            console.error("Product creation error:", error);
+            setLoading(false);
+            // Check if it's an authentication error
+            if (error.response && error.response.status === 401) {
+                alert("Session expired, please login again.");
+                dispatch(logout());
+                history.push("/login");
+                window.location.reload();
+            }
+        }
     };
 
-    if (productCreationSuccess) {
-        alert("Product successfully created.");
-        history.push(`/product/${product.id}/`);
-        dispatch({
-            type: CREATE_PRODUCT_RESET
-        });
-    }
+    const resetForm = () => {
+        setName("");
+        setDescription("");
+        setPrice("");
+        setStock(false);
+        setImage(null);
+        setImages([]);
+        setCategory("");
+    };
+
+    useEffect(() => {
+        if (productCreationSuccess && product) {
+            alert("Product successfully created.");
+            resetForm(); // Reset form after successful creation
+            history.push(`/product/${product.id}/`);
+            dispatch({
+                type: CREATE_PRODUCT_RESET
+            });
+        }
+    }, [productCreationSuccess, product, history, dispatch]);
 
     if (userInfo && tokenError === "Request failed with status code 401") {
         alert("Session expired, please login again.");

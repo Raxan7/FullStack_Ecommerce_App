@@ -140,7 +140,7 @@ export const checkTokenValidation = () => async (dispatch, getState) => {
         const config = {
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${userInfo.token}`
+                Authorization: `Bearer ${userInfo.token || userInfo.access}`
             }
         }
 
