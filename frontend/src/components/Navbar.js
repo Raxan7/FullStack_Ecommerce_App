@@ -64,7 +64,7 @@ function NavBar() {
                 </div>
             )}
             <header>
-                <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
+                <Navbar bg="light" variant="light" expand="lg" collapseOnSelect style={{ backgroundColor: 'white' }}>
                     <Container>
                         <LinkContainer to="/">
                             <Navbar.Brand>
